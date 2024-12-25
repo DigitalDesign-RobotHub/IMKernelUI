@@ -1,0 +1,22 @@
+﻿<UserControl
+  x:Class="IMKernelUI.View.PoseView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+  xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:model="clr-namespace:IMKernelUI.ViewModel"
+  xmlns:view="clr-namespace:IMKernelUI.View"
+  d:Background="LightBlue"
+  d:DataContext="{d:DesignInstance Type=model:PoseViewModel}"
+  d:DesignHeight="450"
+  d:DesignWidth="800"
+  mc:Ignorable="d">
+  <StackPanel>
+    <dxlc:DataLayoutItem Label="参考坐标：">
+      <dxe:ComboBoxEdit ItemsSource="{Binding References}" SelectedItem="{Binding ThePose.Reference}" />
+    </dxlc:DataLayoutItem>
+    <view:TrsfView DataContext="{Binding TrsfViewModel}" />
+  </StackPanel>
+</UserControl>

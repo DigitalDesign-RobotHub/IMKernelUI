@@ -1,10 +1,67 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove=".gitignore" />
+		<None Remove="Resources\Icon\view_axo.svg" />
+		<None Remove="Resources\Icon\view_back.svg" />
+		<None Remove="Resources\Icon\view_bottom.svg" />
+		<None Remove="Resources\Icon\view_fit.svg" />
+		<None Remove="Resources\Icon\view_front.svg" />
+		<None Remove="Resources\Icon\view_left.svg" />
+		<None Remove="Resources\Icon\view_right.svg" />
+		<None Remove="Resources\Icon\view_top.svg" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Properties\DesignTimeResources.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+			<ContainsDesignTimeResources>true</ContainsDesignTimeResources>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.3" />
+		<PackageReference Include="log4net" Version="3.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\CSharpOCCToolKit\CSharpOCCToolKit.vcxproj" />
+		<ProjectReference Include="..\IMKernel\IMKernel.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Resources\Icon\view_axo.svg" />
+		<Resource Include="Resources\Icon\view_back.svg" />
+		<Resource Include="Resources\Icon\view_bottom.svg" />
+		<Resource Include="Resources\Icon\view_fit.svg" />
+		<Resource Include="Resources\Icon\view_front.svg" />
+		<Resource Include="Resources\Icon\view_left.svg" />
+		<Resource Include="Resources\Icon\view_right.svg" />
+		<Resource Include="Resources\Icon\view_top.svg" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="View\PoseView.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="View\TrsfView.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Visualization\OCCCanvas.cs">
+			<SubType>Form</SubType>
+		</Compile>
+		<Compile Update="Visualization\OCCCanvasMouseActions.cs">
+			<SubType>Form</SubType>
+		</Compile>
+	</ItemGroup>
 
 </Project>
