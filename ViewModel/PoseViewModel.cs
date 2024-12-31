@@ -1,9 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
 using IMKernel.OCCExtension;
 using IMKernel.Visualization;
+
+using IMKernelUI.Interfaces;
 
 using OCCTK.OCC.gp;
 
@@ -11,7 +14,7 @@ using Windows.Services.Maps;
 
 namespace IMKernelUI.ViewModel;
 
-public partial class PoseViewModel:ObservableObject {
+public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 
 	public PoseViewModel( Pose pose, ObservableCollection<Pose> references, OCCCanvas? canvas = null ) {
 		inputPose = pose;
@@ -66,4 +69,7 @@ public partial class PoseViewModel:ObservableObject {
 	/// </summary>
 	[ObservableProperty]
 	private ObservableCollection<Pose> references;
+	public void OCCFinilize( ) {
+		TrsfViewModel.OCCFinilize( );
+	}
 }

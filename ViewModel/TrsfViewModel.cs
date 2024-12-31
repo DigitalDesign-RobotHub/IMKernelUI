@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -10,23 +11,36 @@ using IMKernel.OCCExtension;
 using IMKernel.Utils;
 using IMKernel.Visualization;
 
+using IMKernelUI.Interfaces;
+
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
 
 namespace IMKernelUI.ViewModel;
 
-public partial class TrsfViewModel:ObservableObject {
+public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	public TrsfViewModel( Trsf trsf, OCCCanvas? canvas = null ) {
 		TheTrsf = trsf;
 		currentRotationFormula = RotationFormula.Euler_WPR;
 		RotationFormulas = new( ) { RotationFormula.Euler_WPR };
-		ATri = new ATrihedron(10);
-		IsSetTrsfDone = Visibility.Visible;
-		IsSettingTrsf = Visibility.Collapsed;
+		//view
+		MyVisibility = Visibility.Visible;
+		IsSetting = true;
+		//occ
 		OCCCanvas = canvas;
+		ATri = new ATrihedron(10);
 	}
 
+	public void OCCFinilize( ) {
+		try {
+			ATri.RemoveSelf(true);
+			Update( );
+		} catch( Exception ) {
+			throw;
+		}
+	}
 
+	#region View
 
 	[ObservableProperty]
 	private Trsf theTrsf;
@@ -35,6 +49,23 @@ public partial class TrsfViewModel:ObservableObject {
 		(X, Y, Z) = value.Translation;
 		(W, P, R) = value.Rotation.ToEuler(EulerSequence.WPR);
 	}
+	[ObservableProperty]
+	private bool isSetting;
+
+	partial void OnIsSettingChanged( bool value ) {
+		if( value ) {
+			IsSettingVisbility = Visibility.Visible;
+		} else {
+			IsSettingVisbility = Visibility.Collapsed;
+		}
+	}
+
+	[ObservableProperty]
+	private Visibility myVisibility;
+
+	public Visibility IsSettingVisbility { get; protected set; }
+
+	#endregion
 
 	#region 平移
 	[ObservableProperty]
@@ -246,7 +277,7 @@ public partial class TrsfViewModel:ObservableObject {
 	#endregion
 
 	#region 三维显示
-	private ATrihedron ATri { get; }
+	private InteractiveObject ATri { get; }
 	private ThreeDimensionContext? context;
 	public ThreeDimensionContext? Context {
 		protected get { return context; }
@@ -254,8 +285,12 @@ public partial class TrsfViewModel:ObservableObject {
 			context = value;
 			if( context != null && ATri != null ) {
 				context.Display(ATri, true);
+				context.AISContext.SetSelectionMode(ATri, OCCTK.OCC.AIS.SelectionMode.None);
 			}
 		}
+	}
+	~TrsfViewModel( ) {
+		OCCFinilize( );
 	}
 	private OCCCanvas? OCCCanvas { get; }
 
@@ -304,36 +339,21 @@ public partial class TrsfViewModel:ObservableObject {
 		}
 		Update( );
 	}
+
 	#endregion
+
 	#region command
 
-	[ObservableProperty]
-	private Visibility isSettingTrsf ;
-
-	[ObservableProperty]
-	private Visibility isSetTrsfDone ;
-	partial void OnIsSetTrsfDoneChanged( Visibility value ) {
-		if( value == Visibility.Visible ) {
-			IsSettingTrsf = Visibility.Collapsed;
-		} else {
-			IsSettingTrsf = Visibility.Visible;
-		}
-	}
-
-
 	[RelayCommand]
-	private void SetTrsf( ) {
-		OCCCanvas?.Attach(ATri);
-		if( OCCCanvas?.HasActiveMode( ) ?? false ) {
-			IsSetTrsfDone = Visibility.Collapsed;
-		}
-	}
-
-	[RelayCommand]
-	private void ApplyTransfrom( ) {
+	private void ApplyTransform( ) {
 		TheTrsf = TheTrsf * OCCCanvas?.GetTransfrom( );
 		OCCCanvas?.Detach( );
-		IsSetTrsfDone = Visibility.Visible;
+		MyVisibility = Visibility.Collapsed;
+	}
+
+	[RelayCommand]
+	private void CancerTransform( ) {
+		OCCCanvas?.Detach( );
 	}
 
 	#endregion

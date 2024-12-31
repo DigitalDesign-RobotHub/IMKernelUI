@@ -2,6 +2,6 @@
   <!--  定义全局颜色  -->
   <Color x:Key="OK_COLOR">#FF4CAF50</Color>
   <SolidColorBrush x:Key="OK_COLOR_Brush" Color="{StaticResource OK_COLOR}" />
-  <Color x:Key="Cancer_COLOR">#B61616</Color>
+  <Color x:Key="Cancer_COLOR">#DE3E3E</Color>
   <SolidColorBrush x:Key="Cancer_COLOR_Brush" Color="{StaticResource Cancer_COLOR}" />
 </ResourceDictionary>

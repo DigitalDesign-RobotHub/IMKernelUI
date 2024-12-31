@@ -12,7 +12,6 @@
   xmlns:model="clr-namespace:IMKernelUI.ViewModel"
   d:Background="LightBlue"
   d:DataContext="{d:DesignInstance Type=model:TrsfViewModel}"
-  d:DesignHeight="300"
   d:DesignWidth="400"
   mc:Ignorable="d">
   <!--  全局静态资源引用  -->
@@ -24,53 +23,81 @@
       <model:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
     </ResourceDictionary>
   </UserControl.Resources>
-  <dxlc:LayoutControl Padding="2,2,2,2">
-    <dxlc:LayoutGroup Orientation="Vertical">
-      <!--#region 平移-->
-      <dxlc:LayoutItem HorizontalAlignment="Center" Label="位置" />
-      <dxlc:LayoutGroup ItemLabelsAlignment="Local" Orientation="Horizontal">
-        <dxlc:LayoutItem Label="X: ">
-          <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding X, FallbackValue='NaN', TargetNullValue='0.0'}" />
-        </dxlc:LayoutItem>
-        <dxlc:LayoutItem Label="Y: ">
-          <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding Y, FallbackValue='NaN', TargetNullValue='0.0'}" />
-        </dxlc:LayoutItem>
-        <dxlc:LayoutItem Label="Z: ">
-          <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding Z, FallbackValue='NaN', TargetNullValue='0.0'}" />
-        </dxlc:LayoutItem>
-      </dxlc:LayoutGroup>
+
+  <GroupBox Padding="-2,0,-2,0" Header="位姿">
+    <StackPanel VerticalAlignment="Top">
+
+      <!--#region 位置-->
+      <GroupBox Padding="6,0,6,0" Header="位置">
+        <dxlc:LayoutControl Padding="0,0,0,0">
+          <dxlc:LayoutGroup Orientation="Horizontal">
+            <dxlc:LayoutItem Label="X: ">
+              <dxe:TextEdit
+                HorizontalContentAlignment="Center"
+                IsEnabled="{Binding IsSetting}"
+                Text="{Binding X, FallbackValue='NaN', TargetNullValue='0.0'}" />
+            </dxlc:LayoutItem>
+            <dxlc:LayoutItem Label="Y: ">
+              <dxe:TextEdit
+                HorizontalContentAlignment="Center"
+                IsEnabled="{Binding IsSetting}"
+                Text="{Binding Y, FallbackValue='NaN', TargetNullValue='0.0'}" />
+            </dxlc:LayoutItem>
+            <dxlc:LayoutItem Label="Z: ">
+              <dxe:TextEdit
+                HorizontalContentAlignment="Center"
+                IsEnabled="{Binding IsSetting}"
+                Text="{Binding Z, FallbackValue='NaN', TargetNullValue='0.0'}" />
+            </dxlc:LayoutItem>
+          </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+      </GroupBox>
       <!--#endregion-->
-      <!--#region 旋转-->
-      <dxlc:LayoutItem HorizontalAlignment="Center" Label="姿态" />
-      <!--  旋转表示  -->
-      <dxlc:LayoutGroup ItemLabelsAlignment="Local" Orientation="Horizontal">
-        <dxlc:LayoutItem
-          HorizontalAlignment="Left"
-          VerticalAlignment="Center"
-          Label="旋转表示: " />
-        <dxlc:LayoutItem>
-          <dxe:ComboBoxEdit ItemsSource="{Binding RotationFormulas}" SelectedItem="{Binding CurrentRotationFormula}" />
-        </dxlc:LayoutItem>
-      </dxlc:LayoutGroup>
-      <!--#region WPR-->
-      <dxlc:LayoutGroup
-        x:Name="WPR_LayoutGroup"
-        ItemLabelsAlignment="Local"
-        Orientation="Horizontal"
-        Visibility="{Binding CurrentRotationFormula, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=WPR}">
-        <dxlc:LayoutItem Label="W: ">
-          <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding W, FallbackValue='NaN', TargetNullValue='0.0'}" />
-        </dxlc:LayoutItem>
-        <dxlc:LayoutItem Label="P: ">
-          <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding P, FallbackValue='NaN', TargetNullValue='0.0'}" />
-        </dxlc:LayoutItem>
-        <dxlc:LayoutItem Label="R: ">
-          <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding R, FallbackValue='NaN', TargetNullValue='0.0'}" />
-        </dxlc:LayoutItem>
-      </dxlc:LayoutGroup>
-      <!--#endregion-->
-      <!--#region 四元数-->
-      <!--<dxlc:LayoutGroup
+
+      <!--#region 姿态-->
+
+      <GroupBox Padding="6,0,6,0" Header="姿态">
+        <StackPanel Orientation="Vertical">
+          <!--  旋转表示  -->
+          <dxlc:LayoutGroup ItemLabelsAlignment="Local" Orientation="Horizontal">
+            <dxlc:LayoutItem
+              HorizontalAlignment="Left"
+              VerticalAlignment="Center"
+              Label="旋转表示: " />
+            <dxlc:LayoutItem>
+              <dxe:ComboBoxEdit ItemsSource="{Binding RotationFormulas}" SelectedItem="{Binding CurrentRotationFormula}" />
+            </dxlc:LayoutItem>
+          </dxlc:LayoutGroup>
+
+          <!--#region WPR-->
+          <dxlc:LayoutGroup
+            x:Name="WPR_LayoutGroup"
+            ItemLabelsAlignment="Local"
+            Orientation="Horizontal"
+            Visibility="{Binding CurrentRotationFormula, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=WPR}">
+            <dxlc:LayoutItem Label="W: ">
+              <dxe:TextEdit
+                HorizontalContentAlignment="Center"
+                IsEnabled="{Binding IsSetting}"
+                Text="{Binding W, FallbackValue='NaN', TargetNullValue='0.0'}" />
+            </dxlc:LayoutItem>
+            <dxlc:LayoutItem Label="P: ">
+              <dxe:TextEdit
+                HorizontalContentAlignment="Center"
+                IsEnabled="{Binding IsSetting}"
+                Text="{Binding P, FallbackValue='NaN', TargetNullValue='0.0'}" />
+            </dxlc:LayoutItem>
+            <dxlc:LayoutItem Label="R: ">
+              <dxe:TextEdit
+                HorizontalContentAlignment="Center"
+                IsEnabled="{Binding IsSetting}"
+                Text="{Binding R, FallbackValue='NaN', TargetNullValue='0.0'}" />
+            </dxlc:LayoutItem>
+          </dxlc:LayoutGroup>
+          <!--#endregion-->
+
+          <!--#region 四元数-->
+          <!--<dxlc:LayoutGroup
         x:Name="Quat_LayoutGroup"
         Orientation="Horizontal"
         Visibility="{Binding CurrentRotationFormula, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=四元数}">
@@ -87,22 +114,33 @@
           <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding QW, FallbackValue='NaN', TargetNullValue='0.0'}" />
         </dxlc:LayoutItem>
       </dxlc:LayoutGroup>-->
+          <!--#endregion-->
+
+        </StackPanel>
+      </GroupBox>
+
       <!--#endregion-->
-      <!--#endregion-->
+
       <!--#region 交互按钮-->
-      <dxlc:LayoutGroup>
-        <dxlc:LayoutItem Visibility="{Binding IsSetTrsfDone}">
-          <dx:SimpleButton Command="{Binding SetTrsfCommand}" Content="设置" />
+
+      <dxlc:LayoutGroup Margin="0,4,0,0" Visibility="{Binding IsSettingVisbility}">
+        <dxlc:LayoutItem>
+          <dx:SimpleButton
+            Background="{StaticResource OK_COLOR_Brush}"
+            Command="{Binding ApplyTransformCommand}"
+            Content="设置" />
         </dxlc:LayoutItem>
-        <dxlc:LayoutItem Visibility="{Binding IsSettingTrsf}">
-          <dx:SimpleButton Background="{StaticResource OK_COLOR_Brush}" Content="应用" />
-        </dxlc:LayoutItem>
-        <dxlc:LayoutItem Visibility="{Binding IsSettingTrsf}">
-          <dx:SimpleButton Background="{StaticResource Cancer_COLOR_Brush}" Content="取消" />
+        <dxlc:LayoutItem>
+          <dx:SimpleButton
+            Background="{StaticResource Cancer_COLOR_Brush}"
+            Command="{Binding CancerTransformCommand}"
+            Content="取消" />
         </dxlc:LayoutItem>
       </dxlc:LayoutGroup>
-    </dxlc:LayoutGroup>
-    <!--#endregion-->
-  </dxlc:LayoutControl>
+
+      <!--#endregion-->
+
+    </StackPanel>
+  </GroupBox>
 
 </UserControl>

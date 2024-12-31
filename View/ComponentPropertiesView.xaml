@@ -1,0 +1,169 @@
+﻿<UserControl
+  x:Class="IMKernelUI.View.ComponentPropertiesView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:converter="clr-namespace:IMKernelUI.Converter"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+  xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+  xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+  xmlns:local="clr-namespace:IMKernelUI.View"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:model="clr-namespace:IMKernelUI.ViewModel"
+  d:Background="LightBlue"
+  d:DataContext="{d:DesignInstance Type=model:ComponentPropertiesViewModel}"
+  d:DesignHeight="900"
+  d:DesignWidth="500"
+  FontSize="20"
+  mc:Ignorable="d">
+  <UserControl.Resources>
+    <converter:DecimalToFormatStringConverter x:Key="doubleF3" />
+  </UserControl.Resources>
+  <StackPanel>
+
+    <!--#region 基本信息-->
+    <dxlc:LayoutControl>
+      <dxlc:LayoutGroup ItemLabelsAlignment="Local" Orientation="Vertical">
+        <!--  name  -->
+        <dxlc:LayoutItem Label="名称：">
+          <dxe:TextEdit
+            HorizontalContentAlignment="Center"
+            NullText="请输入名称"
+            Text="{Binding Name, FallbackValue='ErrorName', Mode=TwoWay}" />
+        </dxlc:LayoutItem>
+        <!--  shape  -->
+        <dxlc:LayoutItem Label="形状：">
+          <dx:SimpleButton Content="{Binding Shape, FallbackValue='ErrorShape', TargetNullValue='输入形状'}" />
+        </dxlc:LayoutItem>
+      </dxlc:LayoutGroup>
+    </dxlc:LayoutControl>
+    <!--#endregion-->
+
+    <!--#region 定位-->
+    <GroupBox Header="定位">
+      <local:PartView DataContext="{Binding PartViewModel}" />
+    </GroupBox>
+    <!--#endregion-->
+
+    <!--#region 运动关系-->
+    <Expander Header="运动">
+      <StackPanel>
+        <GroupBox Header="运动类型">
+          <dxlc:LayoutGroup Orientation="Vertical">
+            <dxlc:LayoutItem>
+              <dxe:ComboBoxEdit
+                HorizontalContentAlignment="Center"
+                ItemsSource="{Binding AvailableMovementsa}"
+                NullText="选择一个运动类型"
+                SelectedItem="{Binding MovementFormula}" />
+            </dxlc:LayoutItem>
+            <dxlc:LayoutGroup>
+              <dxlc:LayoutItem Label="X: ">
+                <dxe:TextEdit Text="{Binding MovementFormula.X, FallbackValue='Error', TargetNullValue='NaN'}" />
+              </dxlc:LayoutItem>
+              <dxlc:LayoutItem Label="Y: ">
+                <dxe:TextEdit Text="{Binding MovementFormula.Y, FallbackValue='Error', TargetNullValue='NaN'}" />
+              </dxlc:LayoutItem>
+              <dxlc:LayoutItem Label="Z: ">
+                <dxe:TextEdit Text="{Binding MovementFormula.Z, FallbackValue='Error', TargetNullValue='NaN'}" />
+              </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+          </dxlc:LayoutGroup>
+        </GroupBox>
+        <GroupBox Header="运动范围">
+          <!--  运动范围  -->
+          <StackPanel>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition />
+              </Grid.ColumnDefinitions>
+              <dxlc:LayoutItem
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Label="初始值：">
+                <dxe:TextEdit Text="{Binding InitMovement}" />
+              </dxlc:LayoutItem>
+            </Grid>
+            <dxlc:LayoutItem Grid.Row="1" Grid.ColumnSpan="5">
+              <Slider
+                Maximum="{Binding MaxMovement, Converter={StaticResource doubleF3}}"
+                Minimum="{Binding MinMovement, Converter={StaticResource doubleF3}}"
+                Value="{Binding InitMovement, Converter={StaticResource doubleF3}}" />
+            </dxlc:LayoutItem>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="150" />
+              </Grid.ColumnDefinitions>
+              <dxlc:LayoutItem Grid.Column="0" Label="最小值：">
+                <dxe:TextEdit Text="{Binding MinMovement}" />
+              </dxlc:LayoutItem>
+              <dxlc:LayoutItem Grid.Column="2" Label="最大值：">
+                <dxe:TextEdit Text="{Binding MaxMovement}" />
+              </dxlc:LayoutItem>
+            </Grid>
+          </StackPanel>
+        </GroupBox>
+      </StackPanel>
+    </Expander>
+    <!--#endregion-->
+
+    <!--#region 装配关系-->
+    <GroupBox Header="装配">
+      <StackPanel>
+        <GroupBox Header="父部件">
+          <dxlc:LayoutControl Padding="0,0,0,0">
+            <dxlc:LayoutGroup Orientation="Vertical">
+              <!--  parent  -->
+              <dxlc:LayoutItem Label="名称：">
+                <dxe:ComboBoxEdit ItemsSource="{Binding Components}" SelectedItem="{Binding Parent}" />
+              </dxlc:LayoutItem>
+              <!--  安装点  -->
+              <dxlc:LayoutItem Label="安装位置：">
+                <dxe:ComboBoxEdit ItemsSource="{Binding Parent.Connection}" />
+              </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+          </dxlc:LayoutControl>
+        </GroupBox>
+        <GroupBox Header="连接点">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+              <dxlc:LayoutControl
+                x:Name="Connections_LayoutControl"
+                Padding="0,0,0,0"
+                Orientation="Vertical">
+                <dxlc:LayoutItem VerticalAlignment="Center">
+                  <Grid x:Name="Connection_00">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="7*" />
+                      <ColumnDefinition Width="1*" />
+                      <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <dxe:TextEdit
+                      x:Name="Connection_00_TextEdit"
+                      Background="Transparent"
+                      NullText="新增一个连接点"
+                      ShowNullTextForEmptyValue="True" />
+                    <dx:SimpleButton
+                      Grid.Column="1"
+                      Background="Transparent"
+                      Command="{Binding}"
+                      Glyph="{dx:DXImage SvgImages/Icon Builder/Actions_Add.svg}" />
+                  </Grid>
+                </dxlc:LayoutItem>
+              </dxlc:LayoutControl>
+              <local:PoseView
+                Margin="2,2,2,2"
+                DataContext="{Binding ConnectionTrsfVM}"
+                Visibility="{Binding ConnectionPoseVisibility}" />
+            </StackPanel>
+          </ScrollViewer>
+        </GroupBox>
+      </StackPanel>
+    </GroupBox>
+    <!--#endregion-->
+  </StackPanel>
+</UserControl>

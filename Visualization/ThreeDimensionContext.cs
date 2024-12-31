@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using System.Collections.Generic;
+
+using CommunityToolkit.Mvvm.Messaging;
 
 using IMKernel.Interfaces;
 

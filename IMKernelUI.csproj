@@ -4,7 +4,8 @@
 		<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
-		<ImplicitUsings>enable</ImplicitUsings>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -25,10 +26,14 @@
 			<SubType>Designer</SubType>
 			<ContainsDesignTimeResources>true</ContainsDesignTimeResources>
 		</Page>
+		<Page Update="View\ComponentPropertiesView.xaml">
+		  <SubType>Designer</SubType>
+		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="DevExpress.Images" Version="23.2.3" />
 		<PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.3" />
 		<PackageReference Include="log4net" Version="3.0.3" />
 	</ItemGroup>
@@ -50,6 +55,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Properties\Settings.Designer.cs">
+		  <DesignTimeSharedInput>True</DesignTimeSharedInput>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
+		<Compile Update="ViewModel\ComponentPropertiesViewModel.cs">
+		  <SubType>Code</SubType>
+		</Compile>
+		<Compile Update="View\ComponentPropertiesView.xaml.cs">
+		  <SubType>Code</SubType>
+		</Compile>
 		<Compile Update="View\PoseView.xaml.cs">
 			<SubType>Code</SubType>
 		</Compile>
@@ -62,6 +83,20 @@
 		<Compile Update="Visualization\OCCCanvasMouseActions.cs">
 			<SubType>Form</SubType>
 		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Properties\Settings.settings">
+	    <Generator>SettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 
 </Project>

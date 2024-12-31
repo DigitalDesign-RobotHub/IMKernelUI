@@ -1,6 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Text.Json;
+using System.Windows.Forms;
 
 using IMKernel.Command;
 using IMKernel.Interfaces;
@@ -243,6 +247,7 @@ public partial class OCCCanvas {
 	/// 选择框
 	/// </summary>
 	private RubberBand myBubberBand;
+
 	private bool _DetectedAIS;
 	private int mouseDownX;
 	private int mouseDownY;
@@ -274,30 +279,41 @@ public partial class OCCCanvas {
 			//左键需要额外的逻辑
 			if( value == Action3d.LeftNone ) {
 				if( _DetectedAIS ) {
-					// 操作器执行移动
-					if( myManipulator.HasActiveMode( ) ) {
-						_manipulatorMode ??= myManipulator.ActiveMode( );
-						_manipulatorAxis ??= myManipulator.ActiveAxisIndex( );
-						//维持运动模式不变
-						if(
-							myManipulator.ActiveMode( ) == _manipulatorMode
-							&& myManipulator.ActiveAxisIndex( ) == _manipulatorAxis
-						) {
+					//log.Debug($"检测到AIS:{_DetectedAIS}");
+					_currentAction3d = Action3d.Manipulator_Translation;
+					if( myManipulator.IsAttached( ) ) {
+						if( myManipulator.HasActiveMode( ) ) {
+							_manipulatorMode ??= myManipulator.ActiveMode( );
+							_manipulatorAxis ??= myManipulator.ActiveAxisIndex( );
+							//维持运动模式不变
+							if(
+								myManipulator.ActiveMode( ) == _manipulatorMode
+								&& myManipulator.ActiveAxisIndex( ) == _manipulatorAxis
+							) {
+								//移动
+								_currentAction3d = Action3d.Manipulator_Translation;
+							}
+						} else {
 							//移动
 							_currentAction3d = Action3d.Manipulator_Translation;
 						}
 					}
-					//不执行动作
-					else if( AISContext.IsSelected( ) ) {
-						_currentAction3d = Action3d.Prohibition;
-					}
-					_currentAction3d = Action3d.AreaSelect;
+					//if( AISContext.MoreSelected( ) ) {
+					//	// 操作器执行移动
+					//	log.Debug($"ActiveMode:{myManipulator.ActiveMode( )}");
+					//}
+					////不执行动作
+					//else if( AISContext.IsSelected( ) ) {
+					//	_currentAction3d = Action3d.Prohibition;
+					//}
+					//_currentAction3d = Action3d.AreaSelect;
 				} else {
 					_currentAction3d = Action3d.AreaSelect;
 				}
 			} else {
 				_currentAction3d = value;
 			}
+
 			//设置鼠标样式
 			if( CURSORS.TryGetValue(_currentAction3d, out Cursor? cursor) ) {
 				Cursor = cursor;
@@ -308,7 +324,8 @@ public partial class OCCCanvas {
 			MethodInfo? methodInfo = GetType()
 				.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 			if( methodInfo != null ) {
-				methodInfo.Invoke(this, null); // 调用方法
+				// 调用方法
+				methodInfo.Invoke(this, null);
 			} else {
 				// 尝试获取对应的属性
 				PropertyInfo? propertyInfo = GetType()
@@ -345,6 +362,8 @@ public partial class OCCCanvas {
 	CameraOrientation? startCameraOrientation;
 
 	private void OnMouseDown( object? sender, MouseEventArgs e ) {
+		//! 键盘响应一定要获得焦点
+		this.Focus( );
 		//获取鼠标按下的按钮和修改键
 		MouseButtons mouseButtons = MouseButtons;
 		Keys modifiers = ModifierKeys;
@@ -353,25 +372,29 @@ public partial class OCCCanvas {
 		mouseDownY = e.Y;
 		//默认为点击事件
 		CurrentMovingAction3d = Action3d.SingleSelect;
-		//框选由鼠标摁下时决定，如果一开始没框选，则不许后续框选操作
-		AISContext.InitDetected( );
-		_DetectedAIS = AISContext.MoreDetected( );
+		AISContext.InitSelected( );
 		if( mouseButtons == MouseButtons.Middle ) {
 			//! 记录旋转开始点
 			View?.StartRotation(mouseDownX, mouseDownY);
 			startCameraOrientation = View?.CurrentViewOrientation( );
+			//! 记录平移开始点
+			View?.StartPan( );
 		}
-		//! 记录平移开始点
-		View?.StartPan( );
+		AISContext.InitDetected( );
+		_DetectedAIS = AISContext.MoreDetected( );
+		//框选由鼠标摁下时决定，如果一开始没框选，则不许后续框选操作
 		//! 记录变换开始点
+		if( _DetectedAIS ) {
+			myManipulator.DeactivateCurrentMode( );
+			myManipulator.EnableMode(ManipulatorMode.Translation);
+		}
 		if( myManipulator.HasActiveMode( ) ) {
+			log.Debug($"StartTransfrom: {myManipulator.ActiveMode( )}");
 			myManipulator.StartTransform(mouseDownX, mouseDownY, View);
 		}
 	}
 
 	private void OnMouseMove( object? sender, MouseEventArgs e ) {
-		//! 键盘响应一定要获得焦点
-		this.Focus( );
 		// 获取鼠标按下的按钮和修改键
 		MouseButtons mouseButtons = MouseButtons;
 		Keys modifiers = ModifierKeys;
@@ -379,7 +402,8 @@ public partial class OCCCanvas {
 		mouseCurrentY = e.Y;
 
 		//初始化选择
-		AISContext.InitSelected( );
+		//AISContext.InitSelected( );
+		AISContext.InitDetected( );
 		//触发事件（OCC的Y值零点与WPF相反）
 		OnMouseMovedEvent?.Invoke(e.X, Height - e.Y);
 
@@ -392,6 +416,7 @@ public partial class OCCCanvas {
 		//! 单选等操作均需要基于该位置进行
 		//! moveto的坐标是基于pix的，不需要做转换
 		AISContext.MoveTo(mouseCurrentX, mouseCurrentY, View);
+		View.Redraw( );
 	}
 
 	#region Mouse Moved Action
@@ -409,7 +434,9 @@ public partial class OCCCanvas {
 	}
 
 	private void Manipulator_Translation( ) {
-		myManipulator.Transform(mouseCurrentX, mouseCurrentY, View);
+		if( myManipulator.HasActiveMode( ) ) {
+			myManipulator.Transform(mouseCurrentX, mouseCurrentY, View);
+		}
 	}
 
 	#endregion
@@ -427,79 +454,79 @@ public partial class OCCCanvas {
 		//switch在多分支情况下性能更好
 		switch( CurrentMovingAction3d ) {
 			case Action3d.SingleSelect:
-			// 单选
-			AISContext.Select( );
-			if( AISContext.IsSelected( ) ) {
-				// 触发事件，调用所有订阅的方法
-				OnAISSelectionEvent?.Invoke(AISContext.SelectedAIS( ));
-			}
-			break;
-			case Action3d.MultipleSelect:
-			AISContext.XORSelect( );
-			break;
-			case Action3d.AreaSelect:
-			if( HasCheckbox( ) ) {
-				// 移动了,结束单次框选
-				//! 框选是基于pix，不需要做处理
-				AISContext.AreaSelect(
-					Math.Min(mouseDownX, mouseUpX),
-					Math.Min(mouseDownY, mouseUpY),
-					Math.Max(mouseDownX, mouseUpX),
-					Math.Max(mouseDownY, mouseUpY),
-					View
-				);
-			} else {
 				// 单选
 				AISContext.Select( );
-			}
-			break;
-			case Action3d.MultipleAreaSelect:
-			if( HasCheckbox( ) ) {
-				// 移动了 结束连续框选
-				AISContext.MultipleAreaSelect(
-					Math.Min(mouseDownX, mouseUpX),
-					Math.Min(mouseDownY, mouseUpY),
-					Math.Max(mouseDownX, mouseUpX),
-					Math.Max(mouseDownY, mouseUpY),
-					View
-				);
-			} else {
-				//连续选择，只添加
+				if( AISContext.IsSelected( ) ) {
+					// 触发事件，调用所有订阅的方法
+					OnAISSelectionEvent?.Invoke(AISContext.SelectedAIS( ));
+				}
+				break;
+			case Action3d.MultipleSelect:
 				AISContext.XORSelect( );
-			}
-			break;
+				break;
+			case Action3d.AreaSelect:
+				if( HasCheckbox( ) ) {
+					// 移动了,结束单次框选
+					//! 框选是基于pix，不需要做处理
+					AISContext.AreaSelect(
+						Math.Min(mouseDownX, mouseUpX),
+						Math.Min(mouseDownY, mouseUpY),
+						Math.Max(mouseDownX, mouseUpX),
+						Math.Max(mouseDownY, mouseUpY),
+						View
+					);
+				} else {
+					// 单选
+					AISContext.Select( );
+				}
+				break;
+			case Action3d.MultipleAreaSelect:
+				if( HasCheckbox( ) ) {
+					// 移动了 结束连续框选
+					AISContext.MultipleAreaSelect(
+						Math.Min(mouseDownX, mouseUpX),
+						Math.Min(mouseDownY, mouseUpY),
+						Math.Max(mouseDownX, mouseUpX),
+						Math.Max(mouseDownY, mouseUpY),
+						View
+					);
+				} else {
+					//连续选择，只添加
+					AISContext.XORSelect( );
+				}
+				break;
 			case Action3d.AreaZooming:
-			// 结束区域缩放
-			AISContext.Erase(myBubberBand, true);
-			if( HasCheckbox( ) ) {
-				View?.WindowFitAll(mouseDownX, mouseDownY, mouseCurrentX, mouseCurrentY);
-			}
-			break;
+				// 结束区域缩放
+				AISContext.Erase(myBubberBand, true);
+				if( HasCheckbox( ) ) {
+					View?.WindowFitAll(mouseDownX, mouseDownY, mouseCurrentX, mouseCurrentY);
+				}
+				break;
 			case Action3d.DynamicRotation:
-			//+ 用于执行undo命令
-			//do/undo Command
-			//入参需要Camera和View对象
-			commandManager.Execute(new RotationCommand( ), (startCameraOrientation, View));
-			break;
+				//+ 用于执行undo命令
+				//do/undo Command
+				//入参需要Camera和View对象
+				commandManager.Execute(new RotationCommand( ), (startCameraOrientation, View));
+				break;
 			case Action3d.DynamicPanning:
-			break;
+				break;
 			case Action3d.Manipulator_Translation:
-			myManipulator.StopTransform( );
-			break;
+				myManipulator.StopTransform( );
+				break;
 			case Action3d.LeftNone:
-			break;
+				break;
 			case Action3d.None:
-			break;
+				break;
 			case Action3d.XORSelect:
-			//todo
-			break;
+				//todo
+				break;
 			case Action3d.XORAreaSelect:
-			//todo
-			break;
+				//todo
+				break;
 			case Action3d.Prohibition:
-			break;
+				break;
 			default:
-			break;
+				break;
 		}
 
 		// 擦除选择框
@@ -621,17 +648,24 @@ public partial class OCCCanvas {
 	private ManipulatorMode? _manipulatorMode;
 	private ManipulatorAxisIndex? _manipulatorAxis;
 
-
 	public void Attach( InteractiveObject ais ) {
+		//myManipulator.SetPart(ManipulatorMode.Scaling, false);
+		//myManipulator.SetPart(ManipulatorMode.TranslationPlane, false);
 		myManipulator.Attach(ais);
+		//myManipulator.SetModeActivationOnDetection(false);
+		log.Debug($"启用操作器, IsAttached: {myManipulator.IsAttached( )}");
+		log.Debug($"自动激活: {myManipulator.IsModeActivationOnDetection( )}");
+		Update( );
 	}
 
-	public bool HasActiveMode( ) {
-		return myManipulator.HasActiveMode( );
+	public bool IsAttached( ) {
+		return myManipulator.IsAttached( );
 	}
 
 	public void Detach( ) {
 		myManipulator.Detach( );
+		log.Debug($"取消操作器, IsAttached:{myManipulator.IsAttached( )}");
+		Update( );
 	}
 
 	public Trsf GetTransfrom( ) {
