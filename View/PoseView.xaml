@@ -10,13 +10,20 @@
   xmlns:view="clr-namespace:IMKernelUI.View"
   d:Background="LightBlue"
   d:DataContext="{d:DesignInstance Type=model:PoseViewModel}"
-  d:DesignHeight="450"
-  d:DesignWidth="800"
+  d:DesignWidth="400"
+  d:FontSize="20"
   mc:Ignorable="d">
-  <StackPanel>
-    <dxlc:DataLayoutItem Label="参考坐标：">
-      <dxe:ComboBoxEdit ItemsSource="{Binding References}" SelectedItem="{Binding ThePose.Reference}" />
-    </dxlc:DataLayoutItem>
-    <view:TrsfView DataContext="{Binding TrsfViewModel}" />
-  </StackPanel>
+
+  <Border BorderBrush="#ababab" BorderThickness="1">
+    <dxlc:LayoutControl Padding="2,2,2,2" Orientation="Vertical">
+      <dxlc:LayoutItem Label="名称：">
+        <dxe:TextEdit />
+      </dxlc:LayoutItem>
+      <dxlc:DataLayoutItem Label="参考：">
+        <dxe:ComboBoxEdit ItemsSource="{Binding References}" SelectedItem="{Binding ThePose.Reference}" />
+      </dxlc:DataLayoutItem>
+      <view:TrsfView DataContext="{Binding TrsfViewModel}" />
+    </dxlc:LayoutControl>
+  </Border>
+
 </UserControl>

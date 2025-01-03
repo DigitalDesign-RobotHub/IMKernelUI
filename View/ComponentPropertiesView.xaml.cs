@@ -18,8 +18,9 @@ public partial class ComponentPropertiesView:UserControl {
 	public ComponentPropertiesView( ) {
 		InitializeComponent( );
 	}
+
 	public void UpdateConnections( ) {
-		Connections_LayoutControl.Children.Clear( );
+		//Connections_LayoutControl.Children.Clear( );
 	}
 
 	private void Connection_00_TextEdit_DataContextChanged( object sender, System.Windows.DependencyPropertyChangedEventArgs e ) {

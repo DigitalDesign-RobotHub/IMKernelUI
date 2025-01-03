@@ -1,39 +1,101 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 using IMKernel.Kinematic;
 using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
 
-using OCCTK.OCC.AIS;
+using OCCTK.OCC.gp;
 
 namespace IMKernelUI.ViewModel;
 public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 	public MovementFormulaViewModel( ) {
-		AvailableMovements = new(MovementFormulaMap.All);
-		SelectedMovement = MovementFormula.Static;
+		name = "未定义";
+		MovementType = MovementType.Static;
+		MovementAxis = new(new( ), new Dir(1, 0, 0));
 		InitMovement = 0.0;
 		MinMovement = double.NegativeInfinity;
 		MaxMovement = double.PositiveInfinity;
+
+		//view
+		AvailableMovements = new(MovementFormulaMap.All.ToList( ));
+		//todo 自定义运动轴
+		//AvailableMovements.Add(new MovementFormula("自定义", MovementType.Translation, new( )));
+		SelectedMF = MovementFormula.Static;
+		MyVisibility = Visibility.Visible;
+		backupMF = TheMF;
 	}
+
+	#region OCC
+
+	public void OCCFinilize( ) {
+		//todo 
+	}
+
+	private ThreeDimensionContext? context;
+	public ThreeDimensionContext? Context {
+		protected get { return context; }
+		set {
+			context = value;
+		}
+	}
+	#endregion
 
 	#region View
 
 	public List<MovementFormula> AvailableMovements { get; }
 
+	[ObservableProperty]
+	private MovementFormula selectedMF;
+	partial void OnSelectedMFChanged( MovementFormula value ) {
+		if( value.Name == "自定义" ) {
+			//todo 自定义运动轴
+		} else {
+			name = value.Name;
+			MovementType = value.Type;
+			MovementAxis = value.Axis;
+		}
+	}
+
+	[ObservableProperty]
+	private Visibility myVisibility;
+
 	#endregion
 
 	#region Value
 
+	public MovementFormula TheMF {
+		get {
+			return
+				new(name, MovementType, MovementAxis) {
+					InitMovement = InitMovement,
+					MinMovement = MinMovement,
+					MaxMovement = MaxMovement
+				};
+		}
+		set {
+			name = value.Name;
+			MovementType = value.Type;
+			MovementAxis = value.Axis;
+			InitMovement = value.InitMovement;
+			MinMovement = value.MinMovement;
+			MaxMovement = value.MaxMovement;
+			backupMF = value;
+		}
+	}
+
+	private string name;
+
 	[ObservableProperty]
-	private MovementFormula selectedMovement;
+	private MovementType movementType;
+
+	[ObservableProperty]
+	private Ax1 movementAxis;
 
 	/// <summary>
 	/// 初始运动值
@@ -55,70 +117,28 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 
 	#endregion
 
-	//todo 实现范围显示
-	#region OCC
-	private AShape? MinBox { get; }
-	private AShape? MaxBox { get; }
-	private AShape? MinSector { get; }
-	private AShape? MaxSector { get; }
+	#region Command
 
-	private ThreeDimensionContext? context;
-	public ThreeDimensionContext? Context {
-		protected get { return context; }
-		set {
-			context = value;
-			if( context != null && MinBox != null && MaxBox != null ) {
-				context.Display(MinBox, true);
-				context.AISContext.SetSelectionMode(MinBox, SelectionMode.None);
-				context.Display(MaxBox, true);
-				context.AISContext.SetSelectionMode(MaxBox, SelectionMode.None);
-			}
+	/// <summary>
+	/// 用于取消设置的运动方向值
+	/// </summary>
+	private MovementFormula backupMF;
+
+	[RelayCommand]
+	private void Apply( ) {
+		if( MinMovement <= InitMovement &&
+			InitMovement <= MaxMovement ) {
+			MyVisibility = Visibility.Collapsed;
+		} else {
+			MessageBox.Show("运动值超出范围", "错误！");
+			return;
 		}
 	}
 
-	public void OCCFinilize( ) {
-		//todo 
-		throw new NotImplementedException( );
+	[RelayCommand]
+	private void Cancel( ) {
+		TheMF = backupMF;
 	}
-
-	~MovementFormulaViewModel( ) {
-		OCCFinilize( );
-	}
-	private OCCCanvas? OCCCanvas { get; }
-
-	#region 简化代码
-	private Action Update {
-		get {
-			return Context != null
-				? Context.Update
-				: throw new NotImplementedException("需要传入3D上下文管理器");
-		}
-	}
-	private Action<InteractiveObject, bool> Display {
-		get {
-			return Context != null
-				? Context.Display
-				: throw new NotImplementedException("需要传入3D上下文管理器");
-		}
-	}
-	private Action<InteractiveObject, bool> Redisplay {
-		get {
-			return Context != null
-				? Context.Redisplay
-				: throw new NotImplementedException("需要传入3D上下文管理器");
-		}
-	}
-	private Func<InteractiveObject, bool> IsDisplayed {
-		get {
-			if( Context != null ) {
-				return Context.AISContext.IsDisplayed;
-			} else {
-				throw new NotImplementedException("需要传入3D上下文管理器");
-			}
-		}
-	}
-
-	#endregion
 
 	#endregion
 

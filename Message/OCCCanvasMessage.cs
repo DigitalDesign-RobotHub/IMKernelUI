@@ -12,4 +12,5 @@ namespace IMKernelUI.Message;
 public record ViewStatusChangedMessage( (int contextID, bool viewCube, bool orignTri, bool viewTri) Value );
 public record CanvasCreatedMessage( (int contextID, bool viewCube, bool orignTri, bool viewTri) Value );
 
+public record MainCanvasChangedMessage( OCCCanvas Canvas );
 public class MainCanvasRequestMessage( ):RequestMessage<OCCCanvas>;

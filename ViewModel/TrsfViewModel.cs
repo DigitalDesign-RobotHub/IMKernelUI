@@ -6,53 +6,57 @@ using System.Windows.Data;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 using IMKernel.OCCExtension;
 using IMKernel.Utils;
 using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
+using IMKernelUI.Message;
 
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
 
 namespace IMKernelUI.ViewModel;
 
+public delegate void IsSettingChanged( bool value );
+
+
 public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
-	public TrsfViewModel( Trsf trsf, OCCCanvas? canvas = null ) {
-		TheTrsf = trsf;
+	public TrsfViewModel( ) {
+		//value
 		currentRotationFormula = RotationFormula.Euler_WPR;
-		RotationFormulas = new( ) { RotationFormula.Euler_WPR };
+		backupTrsf = new( );
+		theTrsf = new( );
+
 		//view
+		RotationFormulas = new( ) { RotationFormula.Euler_WPR };
 		MyVisibility = Visibility.Visible;
 		IsSetting = true;
-		//occ
-		OCCCanvas = canvas;
-		ATri = new ATrihedron(10);
-	}
 
-	public void OCCFinilize( ) {
-		try {
-			ATri.RemoveSelf(true);
-			Update( );
-		} catch( Exception ) {
-			throw;
-		}
+		//occ
+		ATri = new ATrihedron(10);
+
+		#region Message
+
+		//occ
+		context = WeakReferenceMessenger.Default.Send<Main3DContextRequestMessage>( );
+		WeakReferenceMessenger.Default.Register<Main3DContextChangedMessage>(this, ( r, m ) => {
+			context = m.Context;
+		});
+
+		#endregion
+
 	}
 
 	#region View
 
 	[ObservableProperty]
-	private Trsf theTrsf;
-
-	partial void OnTheTrsfChanged( Trsf value ) {
-		(X, Y, Z) = value.Translation;
-		(W, P, R) = value.Rotation.ToEuler(EulerSequence.WPR);
-	}
-	[ObservableProperty]
 	private bool isSetting;
 
 	partial void OnIsSettingChanged( bool value ) {
+		IsSettingChanged?.Invoke(value);
 		if( value ) {
 			IsSettingVisbility = Visibility.Visible;
 		} else {
@@ -65,9 +69,25 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 
 	public Visibility IsSettingVisbility { get; protected set; }
 
+	public event IsSettingChanged? IsSettingChanged;
+
 	#endregion
 
+	#region Value
+
+	private Trsf theTrsf;
+
+	public Trsf TheTrsf {
+		get { return theTrsf; }
+		set {
+			backupTrsf = value;
+			(X, Y, Z) = value.Translation;
+			(W, P, R) = value.Rotation.ToEuler(EulerSequence.WPR);
+		}
+	}
+
 	#region 平移
+
 	[ObservableProperty]
 	private double x;
 
@@ -174,33 +194,6 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 		}
 	}
 
-	//public double W
-	//{
-	//    get => GetWPR(0).ToDegrees(1);
-	//    set => SetWPR(0, value.ToRadians());
-	//}
-	//public double P
-	//{
-	//    get => GetWPR(1).ToDegrees(1);
-	//    set => SetWPR(1, value.ToRadians());
-	//}
-	//public double R
-	//{
-	//    get => GetWPR(2).ToDegrees(1);
-	//    set => SetWPR(2, value.ToRadians());
-	//}
-
-	//private double GetWPR(int index) {
-	//var q = TheTrsf.Rotation;
-	//var (w, p, r) = q.ToEuler(EulerSequence.Intrinsic_XYZ);
-	//return index switch {
-	//    0 => w,
-	//    1 => p,
-	//    2 => r,
-	//    _ => throw new ArgumentOutOfRangeException(nameof(index))
-	//};
-	//}
-
 	private void SetWPR( int index, double value ) {
 		var q = TheTrsf.Rotation;
 		var (w, p, r) = q.ToEuler(EulerSequence.Intrinsic_XYZ);
@@ -276,8 +269,21 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 
 	#endregion
 
+	#endregion
+
 	#region 三维显示
+
+	public void OCCFinilize( ) {
+		try {
+			ATri.RemoveSelf(true);
+			Update( );
+		} catch( Exception ) {
+			throw;
+		}
+	}
+
 	private InteractiveObject ATri { get; }
+
 	private ThreeDimensionContext? context;
 	public ThreeDimensionContext? Context {
 		protected get { return context; }
@@ -289,9 +295,11 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 			}
 		}
 	}
+
 	~TrsfViewModel( ) {
 		OCCFinilize( );
 	}
+
 	private OCCCanvas? OCCCanvas { get; }
 
 	#region 简化代码
@@ -344,19 +352,27 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 
 	#region command
 
+	/// <summary>
+	/// 用于撤销的变换的值
+	/// </summary>
+	private Trsf backupTrsf;
+
 	[RelayCommand]
-	private void ApplyTransform( ) {
-		TheTrsf = TheTrsf * OCCCanvas?.GetTransfrom( );
+	private void ApplySetting( ) {
 		OCCCanvas?.Detach( );
 		MyVisibility = Visibility.Collapsed;
+		WeakReferenceMessenger.Default.Send(new TrsfSettedMessage( ));
 	}
 
 	[RelayCommand]
-	private void CancerTransform( ) {
+	private void CancelSetting( ) {
 		OCCCanvas?.Detach( );
+		TheTrsf = backupTrsf;
+		WeakReferenceMessenger.Default.Send(new TrsfSettedMessage( ));
 	}
 
 	#endregion
+
 }
 
 /// <summary>

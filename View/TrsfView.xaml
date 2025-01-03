@@ -13,6 +13,7 @@
   d:Background="LightBlue"
   d:DataContext="{d:DesignInstance Type=model:TrsfViewModel}"
   d:DesignWidth="400"
+  d:FontSize="20"
   mc:Ignorable="d">
   <!--  全局静态资源引用  -->
   <UserControl.Resources>
@@ -24,8 +25,11 @@
     </ResourceDictionary>
   </UserControl.Resources>
 
-  <GroupBox Padding="-2,0,-2,0" Header="位姿">
-    <StackPanel VerticalAlignment="Top">
+  <Border BorderBrush="#ababab" BorderThickness="1">
+    <dxlc:LayoutGroup
+      Padding="2,2,2,2"
+      VerticalAlignment="Top"
+      Orientation="Vertical">
 
       <!--#region 位置-->
       <GroupBox Padding="6,0,6,0" Header="位置">
@@ -125,22 +129,22 @@
 
       <dxlc:LayoutGroup Margin="0,4,0,0" Visibility="{Binding IsSettingVisbility}">
         <dxlc:LayoutItem>
-          <dx:SimpleButton
-            Background="{StaticResource OK_COLOR_Brush}"
-            Command="{Binding ApplyTransformCommand}"
-            Content="设置" />
+          <Button
+            Command="{Binding ApplySettingCommand}"
+            Content="设置"
+            Style="{StaticResource OK_Button_Style}" />
         </dxlc:LayoutItem>
         <dxlc:LayoutItem>
-          <dx:SimpleButton
-            Background="{StaticResource Cancer_COLOR_Brush}"
-            Command="{Binding CancerTransformCommand}"
-            Content="取消" />
+          <Button
+            Command="{Binding CancelSettingCommand}"
+            Content="取消"
+            Style="{StaticResource Cancel_Button_Style}" />
         </dxlc:LayoutItem>
       </dxlc:LayoutGroup>
 
       <!--#endregion-->
 
-    </StackPanel>
-  </GroupBox>
+    </dxlc:LayoutGroup>
+  </Border>
 
 </UserControl>

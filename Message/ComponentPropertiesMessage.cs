@@ -8,19 +8,19 @@ namespace IMKernelUI.Message;
 /// <summary>
 ///  部件属性变化
 /// </summary>
-/// <param name="value"></param>
+/// <param name="Value"></param>
 /// <remarks>Message</remarks>
-public record ComponentPropertyChangedMessage( object? value = null );
+public record ComponentPropertyChangedMessage( object? Value = null );
 
 /// <summary>
 /// 部件连接变化
 /// </summary>
-/// <param name="value"></param>
+/// <param name="Value"></param>
 /// <remarks>Message</remarks>
-public record ConnectionChangedMessage( object? value = null );
+public record ConnectionChangedMessage( object? Value = null );
 
 /// <summary>
 /// 部件连接名称变化
 /// </summary>
 /// <remarks>Message</remarks>
-public record ComponentConnectionNameChangedMessage( int componentID, string newName );
+public record ComponentConnectionNameChangedMessage( int ComponentID, string NewName );

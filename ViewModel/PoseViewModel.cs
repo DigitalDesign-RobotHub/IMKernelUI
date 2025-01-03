@@ -1,75 +1,105 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 
 using IMKernel.OCCExtension;
 using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
-
-using OCCTK.OCC.gp;
-
-using Windows.Services.Maps;
+using IMKernelUI.Message;
 
 namespace IMKernelUI.ViewModel;
 
 public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 
-	public PoseViewModel( Pose pose, ObservableCollection<Pose> references, OCCCanvas? canvas = null ) {
-		inputPose = pose;
-		Name = pose.Name;
-		ReferPose = pose.Reference;
-		Transfrom = pose.Transfrom;
-		References = references;
-		TrsfViewModel = new(Transfrom, canvas);
+	public PoseViewModel( ) {
+		//value
+		Name = "";
+		ReferPose = OriginPose.ToPose( );
+		TrsfVM = new( );
+		//view
+		References = new( );
+		TrsfVM.IsSettingChanged += value => IsSetting = value;
+
+		#region Message
+
+		//view
+		WeakReferenceMessenger.Default.Register<ReferencePosesChangedMessage>(this, ( r, m ) => {
+			if( m.Refer.Count != 0 ) {
+				References.Clear( );
+				m.Refer.ForEach(x => References.Add(x));
+			}
+		});
+
+		//occ
+		context = WeakReferenceMessenger.Default.Send<Main3DContextRequestMessage>( );
+		WeakReferenceMessenger.Default.Register<Main3DContextChangedMessage>(this, ( r, m ) => {
+			context = m.Context;
+		});
+
+		#endregion
 	}
+
+	#region 三维显示
+
+	public void OCCFinilize( ) {
+		TrsfVM.OCCFinilize( );
+	}
+
+	private ThreeDimensionContext? context;
+
+	#endregion
+
+	#region Value
 
 	public Pose ThePose {
 		get {
-			if( inputPose != null ) {
-				return inputPose;
-			} else {
-				try {
-					return new(Name, Transfrom, ReferPose);
-				} catch( Exception e ) {
-					throw new Exception($"Pose输入信息有误，创建失败 {e.Message}");
-				}
-			}
+			return new Pose(Name, TrsfVM.TheTrsf, ReferPose);
 		}
-	}
-
-	private Pose? inputPose;
-
-	#region 三维显示
-	private ThreeDimensionContext? context;
-	public ThreeDimensionContext? Context {
-		protected get { return context; }
 		set {
-			context = value;
-			TrsfViewModel.Context = value;
+			Name = value.Name;
+			ReferPose = value.Reference;
+			TrsfVM.TheTrsf = value.Transfrom;
 		}
 	}
-	#endregion
 
 	[ObservableProperty]
-	public TrsfViewModel trsfViewModel;
+	public TrsfViewModel trsfVM;
 
 	[ObservableProperty]
 	private string name;
 
 	[ObservableProperty]
-	private Pose? referPose;
+	private Pose referPose;
+
+	#endregion
+
+	#region View
 
 	[ObservableProperty]
-	private Trsf transfrom;
+	private bool isSetting;
+
+	partial void OnIsSettingChanged( bool value ) {
+		if( value ) {
+			IsSettingVisbility = Visibility.Visible;
+		} else {
+			IsSettingVisbility = Visibility.Collapsed;
+		}
+	}
+
+	[ObservableProperty]
+	private Visibility myVisibility;
+
+	public Visibility IsSettingVisbility { get; protected set; }
 
 	/// <summary>
 	/// 可作为参考的坐标系
 	/// </summary>
-	[ObservableProperty]
-	private ObservableCollection<Pose> references;
-	public void OCCFinilize( ) {
-		TrsfViewModel.OCCFinilize( );
-	}
+	private ObservableCollection<Pose> References { get; }
+
+	#endregion
+
 }

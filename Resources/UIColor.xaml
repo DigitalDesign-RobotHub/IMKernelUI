@@ -1,7 +1,22 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <!--  定义全局颜色  -->
-  <Color x:Key="OK_COLOR">#FF4CAF50</Color>
-  <SolidColorBrush x:Key="OK_COLOR_Brush" Color="{StaticResource OK_COLOR}" />
-  <Color x:Key="Cancer_COLOR">#DE3E3E</Color>
-  <SolidColorBrush x:Key="Cancer_COLOR_Brush" Color="{StaticResource Cancer_COLOR}" />
+﻿<!--  定义全局颜色  -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Color x:Key="OK">#4CAF50</Color>
+  <SolidColorBrush x:Key="OK_Brush" Color="{StaticResource OK}" />
+
+  <Color x:Key="OK_HOVER">#7EAD80</Color>
+  <SolidColorBrush x:Key="OK_HOVER_Brush" Color="{StaticResource OK_HOVER}" />
+
+  <Color x:Key="OK_PRESSED">#367F39</Color>
+  <SolidColorBrush x:Key="OK_PRESSED_Brush" Color="{StaticResource OK_PRESSED}" />
+
+  <Color x:Key="CANCEL">#DE3E3E</Color>
+  <SolidColorBrush x:Key="Cancel_Brush" Color="{StaticResource CANCEL}" />
+
+  <Color x:Key="CANCEL_HOVER">#D99191</Color>
+  <SolidColorBrush x:Key="CANCEL_HOVER_Brush" Color="{StaticResource CANCEL_HOVER}" />
+
+  <Color x:Key="CANCEL_PRESSED">#972A2A</Color>
+  <SolidColorBrush x:Key="CANCEL_PRESSED_Brush" Color="{StaticResource CANCEL_PRESSED}" />
+
 </ResourceDictionary>

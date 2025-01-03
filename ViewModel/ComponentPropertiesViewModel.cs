@@ -6,6 +6,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 
+using DevExpress.Mvvm.POCO;
+
+using IMKernel.Interfaces;
 using IMKernel.Kinematic;
 using IMKernel.Model;
 using IMKernel.OCCExtension;
@@ -23,45 +26,57 @@ using Component = IMKernel.Model.Component;
 namespace IMKernelUI.ViewModel;
 
 /// <summary>
-/// 部件(静态)View Model
+/// 部件View Model
 /// </summary>
-public partial class ComponentPropertiesViewModel:ObservableObject, IOCCFinilize {
+/// <remarks>只包含静态部分的定义</remarks>
+public partial class ComponentPropertiesViewModel:ObservableObject, IOCCFinilize, IComponent {
 	public ComponentPropertiesViewModel( ) {
-		//canvas = WeakReferenceMessenger.Default.Send<MainCanvasRequestMessage>( );
-
+		//value
 		Name = "";
+		PartVM = new( );
 		Parent = new OriginComponent( );
+		Components = new( );
+		Components.Add(new OriginComponent( ));
 	}
+
+	#region OCC
+
+	public void OCCFinilize( ) {
+		PartVM?.OCCFinilize( );
+	}
+
+
+	#endregion
+
+	#region View
 
 	public bool IsComponentValid {
 		get {
 			return true;
 		}
 	}
-	public void OCCFinilize( ) {
-		ThePartViewModel?.OCCFinilize( );
-	}
-	#region Component属性
+
+	public ObservableCollection<IComponent> Components { get; }
+
+	#endregion
+
+	#region Value
+
 	public Component TheComponent {
 		get {
-			//Trsf tWithParent;
-			//if( Parent == null ) {
-			//	tWithParent = PoseViewModel.ThePose.Datum;
-			//} else {
-			//	tWithParent =
-			//		-( Parent.Datum * Parent.Connection[ParentConnection] ) * PoseViewModel.ThePose.Datum;
-			//}
-			return new Component( );
+			return new(Name, PartVM.ThePart, Parent);
+		}
+		set {
+			//todo 
 		}
 	}
-	//public ThreeDimensionContext? Context { protected get; set; }
-	//private OCCCanvas? canvas;
+
 
 	/// <summary>
 	/// 零件VM
 	/// </summary>
 	[ObservableProperty]
-	private PartViewModel? thePartViewModel;
+	private PartViewModel partVM;
 
 	/// <summary>
 	/// 部件名称
@@ -88,6 +103,7 @@ public partial class ComponentPropertiesViewModel:ObservableObject, IOCCFinilize
 	#endregion
 
 	#region command
+
 	#endregion
 
 }

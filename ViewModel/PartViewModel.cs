@@ -2,42 +2,74 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
+using IMKernel.Interfaces;
 using IMKernel.Kinematic;
 using IMKernel.Model;
 using IMKernel.OCCExtension;
+using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
+using IMKernelUI.Message;
 
 using OCCTK.Extension;
+using OCCTK.OCC.gp;
 
 namespace IMKernelUI.ViewModel;
-public partial class PartViewModel:ObservableObject, IOCCFinilize {
+
+/// <summary>
+/// 零件View Model
+/// </summary>
+public partial class PartViewModel:ObservableObject, IOCCFinilize, IPart {
 	public PartViewModel( ) {
+		//value
 		Name = "";
 		Shape = null;
 		Connections = new( );
+		Movements = new( );
 		AvailableMovements = MovementFormulaMap.All.ToList( );
-		TrsfVMVisibility = Visibility.Collapsed;
-		MovementFormulaVMVisibility = Visibility.Collapsed;
+
+		//view
+		PoseVM = new( );
+		MFVM = new( );
+
+		#region Message
+
+		//occ
+		context = WeakReferenceMessenger.Default.Send<Main3DContextRequestMessage>( );
+		WeakReferenceMessenger.Default.Register<Main3DContextChangedMessage>(this, ( r, m ) => {
+			context = m.Context;
+		});
+
+		#endregion
 	}
+
+	#region OCC
+
+	private OCCCanvas? occCanvas;
 
 	public void OCCFinilize( ) {
-		throw new NotImplementedException( );
+		//todo 
 	}
 
-	#region Part属性
+	private ThreeDimensionContext? context;
+
+	#endregion
+
+	#region Value
+
 	public Part ThePart {
 		get { return new( ); }
 		set {
 			//todo 
 		}
 	}
+
 	/// <summary>
 	/// 名称
 	/// </summary>
@@ -50,36 +82,55 @@ public partial class PartViewModel:ObservableObject, IOCCFinilize {
 	[ObservableProperty]
 	private XShape? shape;
 
+	public List<(Trsf transfrom, MovementFormula movementFormula)> JointMovements => throw new NotImplementedException( );
+
 	/// <summary>
 	/// 连接点
 	/// </summary>
-	public ObservableCollection<Pose> Connections { get; }
+	public ObservableCollection<Trsf> Connections { get; }
+
+	/// <summary>
+	/// 连接点
+	/// </summary>
+	public ObservableCollection<MovementFormula> Movements { get; }
 
 	#endregion
 
-	#region View属性
+	#region View
 
 	public List<MovementFormula> AvailableMovements { get; }
-
-	[ObservableProperty]
-	private Visibility trsfVMVisibility;
-
 
 	/// <summary>
 	/// 连接点位姿VM
 	/// </summary>
 	[ObservableProperty]
-	private TrsfViewModel? trsfVM;
-
-	[ObservableProperty]
-	private Visibility movementFormulaVMVisibility;
+	private PoseViewModel poseVM;
 
 	/// <summary>
 	/// 运动方向VM
 	/// </summary>
 	[ObservableProperty]
-	private MovementFormulaViewModel? movementFormulaVM;
-
+	private MovementFormulaViewModel mFVM;
 
 	#endregion
+
+	#region Command
+
+	[RelayCommand]
+	private void SetTrsf( ) {
+		if( PoseVM != null ) {
+			PoseVM.MyVisibility = Visibility.Visible;
+		} else {
+		}
+	}
+
+	[RelayCommand]
+	private void SetMF( ) {
+		if( MFVM != null ) {
+			MFVM.MyVisibility = Visibility.Visible;
+		}
+	}
+
+	#endregion
+
 }
