@@ -28,8 +28,8 @@
     <StackPanel Orientation="Vertical">
       <dxlc:LayoutItem Label="运动方向：">
         <ComboBox ItemsSource="{Binding AvailableMovements}" SelectedItem="{Binding SelectedMF}" />
+        <!--  todo 根据方向的不同设置下拉菜单的底色 X/Y/Z  -->
       </dxlc:LayoutItem>
-
       <Grid Margin="0,2,0,0">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
@@ -70,7 +70,7 @@
       </Grid>
       <!--#region 交互按钮-->
 
-      <dxlc:LayoutGroup Margin="0,4,0,0" Visibility="{Binding IsSettingVisbility}">
+      <dxlc:LayoutGroup Margin="0,4,0,0" Visibility="{Binding MyVisibility}">
         <dxlc:LayoutItem>
           <Button
             Command="{Binding ApplyCommand}"
@@ -86,6 +86,8 @@
       </dxlc:LayoutGroup>
 
       <!--#endregion-->
+
     </StackPanel>
   </GroupBox>
+
 </UserControl>

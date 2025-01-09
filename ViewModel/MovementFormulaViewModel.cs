@@ -4,11 +4,13 @@ using System.Windows;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 using IMKernel.Kinematic;
 using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
+using IMKernelUI.Message;
 
 using OCCTK.OCC.gp;
 
@@ -19,8 +21,10 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 		MovementType = MovementType.Static;
 		MovementAxis = new(new( ), new Dir(1, 0, 0));
 		InitMovement = 0.0;
-		MinMovement = double.NegativeInfinity;
-		MaxMovement = double.PositiveInfinity;
+		MinMovement = -1000;
+		MaxMovement = 1000;
+		//MinMovement = double.NegativeInfinity;
+		//MaxMovement = double.PositiveInfinity;
 
 		//view
 		AvailableMovements = new(MovementFormulaMap.All.ToList( ));
@@ -120,24 +124,32 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 	#region Command
 
 	/// <summary>
-	/// 用于取消设置的运动方向值
+	/// 备份输入的值
 	/// </summary>
+	/// <remarks>用于取消设置的运动方向值</remarks>
 	private MovementFormula backupMF;
 
+	/// <summary>
+	/// 应用设置，并关闭窗口
+	/// </summary>
 	[RelayCommand]
 	private void Apply( ) {
 		if( MinMovement <= InitMovement &&
 			InitMovement <= MaxMovement ) {
-			MyVisibility = Visibility.Collapsed;
+			WeakReferenceMessenger.Default.Send(new MovementFormulaAppliedMessage( ));
 		} else {
 			MessageBox.Show("运动值超出范围", "错误！");
 			return;
 		}
 	}
 
+	/// <summary>
+	/// 取消设置，并关闭窗口
+	/// </summary>
 	[RelayCommand]
 	private void Cancel( ) {
 		TheMF = backupMF;
+		WeakReferenceMessenger.Default.Send(new MovementFormulaCanceledMessage( ));
 	}
 
 	#endregion

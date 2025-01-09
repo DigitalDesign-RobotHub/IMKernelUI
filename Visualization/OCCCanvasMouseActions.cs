@@ -6,8 +6,9 @@ using System.Reflection;
 using System.Text.Json;
 using System.Windows.Forms;
 
-using IMKernel.Command;
-using IMKernel.Interfaces;
+using IMKernelUI.Command;
+
+using IMKernelUI.Interfaces;
 
 using OCCTK.Extension;
 using OCCTK.OCC.AIS;

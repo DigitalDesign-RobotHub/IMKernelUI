@@ -20,8 +20,6 @@ using OCCTK.OCC.gp;
 
 namespace IMKernelUI.ViewModel;
 
-public delegate void IsSettingChanged( bool value );
-
 
 public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	public TrsfViewModel( ) {
@@ -46,30 +44,32 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 			context = m.Context;
 		});
 
+		//command
+		var cmMessage = WeakReferenceMessenger.Default.Send<CommandManagerRequestMessage>( );
+		commandManager = cmMessage.Response;
+
 		#endregion
 
 	}
 
 	#region View
 
+	/// <summary>
+	/// 是否开启设置
+	/// </summary>
 	[ObservableProperty]
 	private bool isSetting;
 
-	partial void OnIsSettingChanged( bool value ) {
-		IsSettingChanged?.Invoke(value);
-		if( value ) {
-			IsSettingVisbility = Visibility.Visible;
-		} else {
-			IsSettingVisbility = Visibility.Collapsed;
-		}
-	}
-
+	/// <summary>
+	/// 控件的可见性
+	/// </summary>
 	[ObservableProperty]
 	private Visibility myVisibility;
 
-	public Visibility IsSettingVisbility { get; protected set; }
-
-	public event IsSettingChanged? IsSettingChanged;
+	/// <summary>
+	/// 交互按钮的可见性
+	/// </summary>
+	public Visibility IsSettingVisbility { get; set; }
 
 	#endregion
 
@@ -352,23 +352,30 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 
 	#region command
 
+	private ICommandManager commandManager;
+
 	/// <summary>
 	/// 用于撤销的变换的值
 	/// </summary>
 	private Trsf backupTrsf;
 
+	/// <summary>
+	/// 应用设置
+	/// </summary>
 	[RelayCommand]
 	private void ApplySetting( ) {
 		OCCCanvas?.Detach( );
-		MyVisibility = Visibility.Collapsed;
-		WeakReferenceMessenger.Default.Send(new TrsfSettedMessage( ));
+		WeakReferenceMessenger.Default.Send(new TrsfAppliedMessage( ));
 	}
 
+	/// <summary>
+	/// 取消设置
+	/// </summary>
 	[RelayCommand]
 	private void CancelSetting( ) {
 		OCCCanvas?.Detach( );
 		TheTrsf = backupTrsf;
-		WeakReferenceMessenger.Default.Send(new TrsfSettedMessage( ));
+		WeakReferenceMessenger.Default.Send(new TrsfCanceledMessage( ));
 	}
 
 	#endregion

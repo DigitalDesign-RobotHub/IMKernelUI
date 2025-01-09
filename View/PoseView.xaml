@@ -13,17 +13,47 @@
   d:DesignWidth="400"
   d:FontSize="20"
   mc:Ignorable="d">
+  <!--  全局静态资源引用  -->
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/IMKernelUI;component/Properties/DesignTimeResources.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+      <model:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
+    </ResourceDictionary>
+  </UserControl.Resources>
 
   <Border BorderBrush="#ababab" BorderThickness="1">
     <dxlc:LayoutControl Padding="2,2,2,2" Orientation="Vertical">
       <dxlc:LayoutItem Label="名称：">
         <dxe:TextEdit />
       </dxlc:LayoutItem>
-      <dxlc:DataLayoutItem Label="参考：">
+      <dxlc:LayoutItem Label="参考：">
         <dxe:ComboBoxEdit ItemsSource="{Binding References}" SelectedItem="{Binding ThePose.Reference}" />
-      </dxlc:DataLayoutItem>
-      <view:TrsfView DataContext="{Binding TrsfViewModel}" />
+      </dxlc:LayoutItem>
+      <dxlc:LayoutItem>
+        <view:TrsfView DataContext="{Binding TrsfVM}" />
+      </dxlc:LayoutItem>
+
+      <!--#region 交互按钮-->
+
+      <dxlc:LayoutGroup Margin="0,4,0,0" Visibility="{Binding IsSettingVisbility}">
+        <dxlc:LayoutItem>
+          <Button
+            Command="{Binding ApplySettingCommand}"
+            Content="设置"
+            Style="{StaticResource OK_Button_Style}" />
+        </dxlc:LayoutItem>
+        <dxlc:LayoutItem>
+          <Button
+            Command="{Binding CancelSettingCommand}"
+            Content="取消"
+            Style="{StaticResource Cancel_Button_Style}" />
+        </dxlc:LayoutItem>
+      </dxlc:LayoutGroup>
     </dxlc:LayoutControl>
   </Border>
+
+  <!--#endregion-->
 
 </UserControl>

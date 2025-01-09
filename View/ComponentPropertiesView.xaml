@@ -42,7 +42,7 @@
               </dxlc:LayoutItem>
               <!--  安装点  -->
               <dxlc:LayoutItem Label="安装位置：">
-                <dxe:ComboBoxEdit ItemsSource="{Binding Parent.Connection, TargetNullValue='无连接'}" />
+                <dxe:ComboBoxEdit ItemsSource="{Binding ParentConnection, TargetNullValue='无连接'}" />
               </dxlc:LayoutItem>
             </dxlc:LayoutGroup>
           </dxlc:LayoutControl>

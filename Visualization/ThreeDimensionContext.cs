@@ -2,8 +2,7 @@
 
 using CommunityToolkit.Mvvm.Messaging;
 
-using IMKernel.Interfaces;
-
+using IMKernelUI.Interfaces;
 using IMKernelUI.Message;
 
 using OCCTK.OCC.AIS;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 
 using IMKernel.OCCExtension;
@@ -10,6 +10,8 @@ using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
 using IMKernelUI.Message;
+
+using OCCTK.OCC.gp;
 
 namespace IMKernelUI.ViewModel;
 
@@ -19,10 +21,11 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 		//value
 		Name = "";
 		ReferPose = OriginPose.ToPose( );
+		backupPose = OriginPose.ToPose( );
 		TrsfVM = new( );
 		//view
 		References = new( );
-		TrsfVM.IsSettingChanged += value => IsSetting = value;
+		TrsfVM.IsSettingVisbility = Visibility.Collapsed;
 
 		#region Message
 
@@ -45,11 +48,11 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 
 	#region 三维显示
 
+	private ThreeDimensionContext? context;
+
 	public void OCCFinilize( ) {
 		TrsfVM.OCCFinilize( );
 	}
-
-	private ThreeDimensionContext? context;
 
 	#endregion
 
@@ -66,22 +69,52 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 		}
 	}
 
+	/// <summary>
+	/// Trsf
+	/// </summary>
 	[ObservableProperty]
 	public TrsfViewModel trsfVM;
 
+	/// <summary>
+	///	名称
+	/// </summary>
 	[ObservableProperty]
 	private string name;
 
+	/// <summary>
+	/// 参考位姿
+	/// </summary>
 	[ObservableProperty]
 	private Pose referPose;
+
+	partial void OnReferPoseChanged( Pose value ) {
+		//todo occ
+	}
 
 	#endregion
 
 	#region View
 
+	/// <summary>
+	/// 是否开启设置
+	/// </summary>
 	[ObservableProperty]
 	private bool isSetting;
 
+	partial void OnIsSettingChanging( bool value ) {
+		TrsfVM.IsSetting = value;
+	}
+
+	/// <summary>
+	/// 控件的可见性
+	/// </summary>
+	[ObservableProperty]
+	private Visibility myVisibility;
+
+	/// <summary>
+	/// 交互按钮是否可见
+	/// </summary>
+	public Visibility IsSettingVisbility { get; set; }
 	partial void OnIsSettingChanged( bool value ) {
 		if( value ) {
 			IsSettingVisbility = Visibility.Visible;
@@ -90,15 +123,32 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 		}
 	}
 
-	[ObservableProperty]
-	private Visibility myVisibility;
-
-	public Visibility IsSettingVisbility { get; protected set; }
-
 	/// <summary>
 	/// 可作为参考的坐标系
 	/// </summary>
-	private ObservableCollection<Pose> References { get; }
+	public ObservableCollection<Pose> References { get; }
+
+	#endregion
+
+	#region Command
+
+	/// <summary>
+	/// 用于撤销设置的值
+	/// </summary>
+	private Pose backupPose;
+
+	[RelayCommand]
+	private void ApplySetting( ) {
+		//OCCCanvas?.Detach( );
+		WeakReferenceMessenger.Default.Send(new PoseAppliedMessage( ));
+	}
+
+	[RelayCommand]
+	private void CancelSetting( ) {
+		//OCCCanvas?.Detach( );
+		ThePose = backupPose;
+		WeakReferenceMessenger.Default.Send(new PoseSetCanceledMessage( ));
+	}
 
 	#endregion
 
