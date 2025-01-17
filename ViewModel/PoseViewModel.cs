@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,8 +11,6 @@ using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
 using IMKernelUI.Message;
-
-using OCCTK.OCC.gp;
 
 namespace IMKernelUI.ViewModel;
 
@@ -75,11 +74,23 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 	[ObservableProperty]
 	public TrsfViewModel trsfVM;
 
+	partial void OnTrsfVMChanged( TrsfViewModel value ) {
+		ApplySettingCommand.NotifyCanExecuteChanged( );
+		//通知绑定整个对象发生了变化
+		OnPropertyChanged(string.Empty);
+	}
+
 	/// <summary>
 	///	名称
 	/// </summary>
 	[ObservableProperty]
 	private string name;
+
+	partial void OnNameChanged( string value ) {
+		ApplySettingCommand.NotifyCanExecuteChanged( );
+		//通知绑定整个对象发生了变化
+		OnPropertyChanged(string.Empty);
+	}
 
 	/// <summary>
 	/// 参考位姿
@@ -109,7 +120,7 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 	/// 控件的可见性
 	/// </summary>
 	[ObservableProperty]
-	private Visibility myVisibility;
+	private Visibility visibility;
 
 	/// <summary>
 	/// 交互按钮是否可见
@@ -132,15 +143,24 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 
 	#region Command
 
+
 	/// <summary>
 	/// 用于撤销设置的值
 	/// </summary>
 	private Pose backupPose;
 
-	[RelayCommand]
+	[RelayCommand(CanExecute = nameof(CanApplySetting))]
 	private void ApplySetting( ) {
 		//OCCCanvas?.Detach( );
 		WeakReferenceMessenger.Default.Send(new PoseAppliedMessage( ));
+	}
+
+
+	private bool CanApplySetting( ) {
+		if( Name == "" ) {
+			return false;
+		}
+		return true;
 	}
 
 	[RelayCommand]

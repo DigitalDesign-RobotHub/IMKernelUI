@@ -6,4 +6,4 @@ using System.Threading.Tasks;
 
 namespace IMKernelUI.Message;
 public record TrsfAppliedMessage( ) { }
-public record TrsfCanceledMessage( ) { }
+public record TrsfSetCanceledMessage( ) { }

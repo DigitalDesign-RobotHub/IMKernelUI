@@ -70,7 +70,7 @@
       </Grid>
       <!--#region 交互按钮-->
 
-      <dxlc:LayoutGroup Margin="0,4,0,0" Visibility="{Binding MyVisibility}">
+      <dxlc:LayoutGroup Margin="0,4,0,0" Visibility="{Binding Visibility}">
         <dxlc:LayoutItem>
           <Button
             Command="{Binding ApplyCommand}"

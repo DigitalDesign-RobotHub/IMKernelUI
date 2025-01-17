@@ -82,9 +82,11 @@ public partial class OCCCanvas {
 		InitializeComponent( );
 		//! 删除From自带的边界
 		FormBorderStyle = FormBorderStyle.None;
+
 		//! ControlStyles.DoubleBuffer 双缓冲会导致画面绘制失效，不能启用
 		SetStyle(ControlStyles.OptimizedDoubleBuffer, false); // 关闭优化双重缓冲
-															  //! 设置自定义绘制和防止擦除背景，避免拖动画布时画面闪动
+
+		//! 设置自定义绘制和防止擦除背景，避免拖动画布时画面闪动
 		SetStyle(ControlStyles.AllPaintingInWmPaint, true); // 防止擦除背景。
 		SetStyle(ControlStyles.UserPaint, true); // 使用自定义的绘制。
 

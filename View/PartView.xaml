@@ -50,6 +50,9 @@
             </dxlc:LayoutControl>
           </dx:DropDownButton>
         </dxlc:LayoutItem>
+        <dxlc:LayoutItem>
+          <Button Command="{Binding AddNewJointCommand}" Content="testB" />
+        </dxlc:LayoutItem>
       </dxlc:LayoutGroup>
     </dxlc:LayoutControl>
 
@@ -59,6 +62,7 @@
 
     <GroupBox Padding="2,2,2,2" Header="连接点">
       <StackPanel ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+
         <Border BorderBrush="#ababab" BorderThickness="1">
           <Grid x:Name="Connections_Grid">
             <Grid.ColumnDefinitions>
@@ -71,7 +75,6 @@
             <Grid.RowDefinitions>
               <RowDefinition />
               <RowDefinition Height="Auto" />
-              <RowDefinition />
               <RowDefinition />
               <RowDefinition />
             </Grid.RowDefinitions>
@@ -127,44 +130,22 @@
 
             <Label
               Grid.Row="3"
-              Grid.RowSpan="2"
               Padding="2,2,2,2"
               HorizontalContentAlignment="Center"
               VerticalContentAlignment="Center"
               Background="#ffc"
-              Content="0" />
+              Content="新增" />
             <Button
               Grid.Row="3"
               Grid.Column="2"
-              Padding="2,2,2,2"
-              Command="{Binding SetTrsfCommand}"
-              Content="xyz: (4,5,6), wpr: (40,0,90)" />
-            <Button
-              Grid.Row="5"
-              Grid.Column="2"
-              Padding="2,2,2,2"
-              Command="{Binding SetMFCommand}"
-              Content="运动类型" />
-            <Button
-              Grid.Row="3"
-              Grid.RowSpan="2"
-              Grid.Column="3"
+              Grid.ColumnSpan="3"
               Padding="0,0,0,0"
               HorizontalContentAlignment="Center"
               VerticalContentAlignment="Center"
               Background="LightGray"
+              Command="{Binding AddNewJointCommand}"
               Content="➕"
               Foreground="{StaticResource OK_Brush}" />
-            <Button
-              Grid.Row="3"
-              Grid.RowSpan="2"
-              Grid.Column="4"
-              Padding="2,2,2,2"
-              HorizontalContentAlignment="Center"
-              VerticalContentAlignment="Center"
-              Background="LightGray"
-              Content="➖"
-              Foreground="{StaticResource Cancel_Brush}" />
           </Grid>
         </Border>
 
@@ -173,12 +154,14 @@
           Padding="2,2,2,2"
           d:Visibility="Visible"
           BorderBrush="#ababab"
-          BorderThickness="1">
+          BorderThickness="1"
+          Visibility="{Binding IsSettingVisibility}">
           <StackPanel>
-            <view:PoseView DataContext="{Binding PoseVM}" Visibility="{Binding MyVisibility}" />
-            <view:MovementFormulaView DataContext="{Binding MFVM}" Visibility="{Binding MyVisibility}" />
+            <view:TrsfView DataContext="{Binding TrsfVM}" Visibility="{Binding Visibility}" />
+            <view:MovementFormulaView DataContext="{Binding MFVM}" Visibility="{Binding Visibility}" />
           </StackPanel>
         </Border>
+
       </StackPanel>
     </GroupBox>
 

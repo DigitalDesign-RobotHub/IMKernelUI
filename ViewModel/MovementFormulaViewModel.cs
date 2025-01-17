@@ -31,7 +31,7 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 		//todo 自定义运动轴
 		//AvailableMovements.Add(new MovementFormula("自定义", MovementType.Translation, new( )));
 		SelectedMF = MovementFormula.Static;
-		MyVisibility = Visibility.Visible;
+		Visibility = Visibility.Visible;
 		backupMF = TheMF;
 	}
 
@@ -52,7 +52,7 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 
 	#region View
 
-	public List<MovementFormula> AvailableMovements { get; }
+	public List<MovementFormula> AvailableMovements { get; set; }
 
 	[ObservableProperty]
 	private MovementFormula selectedMF;
@@ -67,7 +67,7 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 	}
 
 	[ObservableProperty]
-	private Visibility myVisibility;
+	private Visibility visibility;
 
 	#endregion
 
@@ -139,7 +139,6 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 			WeakReferenceMessenger.Default.Send(new MovementFormulaAppliedMessage( ));
 		} else {
 			MessageBox.Show("运动值超出范围", "错误！");
-			return;
 		}
 	}
 

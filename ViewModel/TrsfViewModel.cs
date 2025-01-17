@@ -30,7 +30,7 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 
 		//view
 		RotationFormulas = new( ) { RotationFormula.Euler_WPR };
-		MyVisibility = Visibility.Visible;
+		Visibility = Visibility.Visible;
 		IsSetting = true;
 
 		//occ
@@ -64,7 +64,7 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	/// 控件的可见性
 	/// </summary>
 	[ObservableProperty]
-	private Visibility myVisibility;
+	private Visibility visibility;
 
 	/// <summary>
 	/// 交互按钮的可见性
@@ -95,6 +95,9 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 		try {
 			SetTranslation(0, value);
 			UpdateATri( );
+			ApplySettingCommand.NotifyCanExecuteChanged( );
+			//通知绑定整个对象发生了变化
+			OnPropertyChanged(string.Empty);
 		} catch( Exception ) {
 			Context?.Erase(ATri, true);
 		}
@@ -107,6 +110,9 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 		try {
 			SetTranslation(1, value);
 			UpdateATri( );
+			ApplySettingCommand.NotifyCanExecuteChanged( );
+			//通知绑定整个对象发生了变化
+			OnPropertyChanged(string.Empty);
 		} catch( Exception ) {
 			Context?.Erase(ATri, true);
 		}
@@ -119,6 +125,9 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 		try {
 			SetTranslation(2, value);
 			UpdateATri( );
+			ApplySettingCommand.NotifyCanExecuteChanged( );
+			//通知绑定整个对象发生了变化
+			OnPropertyChanged(string.Empty);
 		} catch( Exception ) {
 			Context?.Erase(ATri, true);
 		}
@@ -165,6 +174,9 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 		try {
 			SetWPR(0, value.ToRadians( ));
 			UpdateATri( );
+			ApplySettingCommand.NotifyCanExecuteChanged( );
+			//通知绑定整个对象发生了变化
+			OnPropertyChanged(string.Empty);
 		} catch( Exception ) {
 			Context?.Erase(ATri, true);
 		}
@@ -177,6 +189,10 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 		try {
 			SetWPR(1, value.ToRadians( ));
 			UpdateATri( );
+			ApplySettingCommand.NotifyCanExecuteChanged( );
+			//通知绑定整个对象发生了变化
+			OnPropertyChanged(string.Empty);
+
 		} catch( Exception ) {
 			Context?.Erase(ATri, true);
 		}
@@ -189,6 +205,9 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 		try {
 			SetWPR(2, value.ToRadians( ));
 			UpdateATri( );
+			ApplySettingCommand.NotifyCanExecuteChanged( );
+			//通知绑定整个对象发生了变化
+			OnPropertyChanged(string.Empty);
 		} catch( Exception ) {
 			Context?.Erase(ATri, true);
 		}
@@ -362,10 +381,14 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	/// <summary>
 	/// 应用设置
 	/// </summary>
-	[RelayCommand]
+	[RelayCommand(CanExecute = nameof(CanApplySetting))]
 	private void ApplySetting( ) {
 		OCCCanvas?.Detach( );
 		WeakReferenceMessenger.Default.Send(new TrsfAppliedMessage( ));
+	}
+
+	private bool CanApplySetting( ) {
+		return true;
 	}
 
 	/// <summary>
@@ -375,7 +398,7 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	private void CancelSetting( ) {
 		OCCCanvas?.Detach( );
 		TheTrsf = backupTrsf;
-		WeakReferenceMessenger.Default.Send(new TrsfCanceledMessage( ));
+		WeakReferenceMessenger.Default.Send(new TrsfSetCanceledMessage( ));
 	}
 
 	#endregion
