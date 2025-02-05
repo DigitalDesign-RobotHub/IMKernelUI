@@ -31,9 +31,9 @@ public partial class PartViewModel:ObservableObject, IOCCFinilize, IPart {
 	public PartViewModel( ) {
 		//value
 		Name = "";
-		Shape = null;
 		AvailableMovements = MovementFormulaMap.All.ToList( );
-		JointMovements = new( );
+		Connections = new( );
+		Movements = new( );
 
 		//view
 		currentJointTrsfIndex = -1;
@@ -89,8 +89,8 @@ public partial class PartViewModel:ObservableObject, IOCCFinilize, IPart {
 		get {
 			return new( ) {
 				Name = Name,
-				Shape = Shape,
-				JointMovements = JointMovements,
+				Connections = Connections,
+				Movements = Movements,
 			};
 		}
 		set {
@@ -104,14 +104,6 @@ public partial class PartViewModel:ObservableObject, IOCCFinilize, IPart {
 	[ObservableProperty]
 	private string name;
 
-	/// <summary>
-	///	形状
-	/// </summary>
-	[ObservableProperty]
-	private XShape? shape;
-
-	public List<(Trsf transfrom, MovementFormula movementFormula)> JointMovements { get; }
-
 	#endregion
 
 	#region View
@@ -120,6 +112,10 @@ public partial class PartViewModel:ObservableObject, IOCCFinilize, IPart {
 	private Visibility isSettingVisibility;
 
 	public List<MovementFormula> AvailableMovements { get; }
+
+	public List<Trsf> Connections { get; }
+
+	public List<MovementFormula> Movements { get; }
 
 	/// <summary>
 	/// 连接点位姿VM
@@ -157,7 +153,7 @@ public partial class PartViewModel:ObservableObject, IOCCFinilize, IPart {
 		currentJointTrsfIndex = ( rowIndex - 3 ) / 3;
 		TrsfVM.Visibility = Visibility.Visible;
 		IsSettingVisibility = Visibility.Visible;
-		TrsfVM.TheTrsf = JointMovements[currentJointTrsfIndex].transfrom;
+		TrsfVM.TheTrsf = Connections[currentJointTrsfIndex];
 	}
 
 	[RelayCommand]
@@ -166,7 +162,7 @@ public partial class PartViewModel:ObservableObject, IOCCFinilize, IPart {
 		currentJointMFTrsfIndex = ( rowIndex - 3 - 2 ) / 3;
 		MFVM.Visibility = Visibility.Visible;
 		IsSettingVisibility = Visibility.Visible;
-		MFVM.TheMF = JointMovements[currentJointMFTrsfIndex].movementFormula;
+		MFVM.TheMF = Movements[currentJointMFTrsfIndex];
 	}
 
 	#endregion

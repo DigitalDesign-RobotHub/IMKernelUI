@@ -35,23 +35,8 @@
             NullText="请输入名称"
             Text="{Binding Name, FallbackValue='ErrorName', Mode=TwoWay}" />
         </dxlc:LayoutItem>
-        <!--  shape  -->
-        <dxlc:LayoutItem Label="形状：">
-          <dx:DropDownButton>
-            <dxlc:LayoutControl>
-              <dxlc:LayoutGroup>
-                <dxlc:LayoutItem>
-                  <dx:SimpleButton Content="添加形状" />
-                </dxlc:LayoutItem>
-                <dxlc:LayoutItem>
-                  <dx:SimpleButton Content="修改形状" />
-                </dxlc:LayoutItem>
-              </dxlc:LayoutGroup>
-            </dxlc:LayoutControl>
-          </dx:DropDownButton>
-        </dxlc:LayoutItem>
         <dxlc:LayoutItem>
-          <Button Command="{Binding AddNewJointCommand}" Content="testB" />
+          <Button Command="{Binding AddNewJointCommand}" Content="添加连接点" />
         </dxlc:LayoutItem>
       </dxlc:LayoutGroup>
     </dxlc:LayoutControl>
