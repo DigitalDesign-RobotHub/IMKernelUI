@@ -19,6 +19,7 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/IMKernelUI;component/Properties/DesignTimeResources.xaml" />
       </ResourceDictionary.MergedDictionaries>
+      <model:FontSizeToWidthConverter x:Key="FontToWidth" />
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -51,35 +52,21 @@
         <Border BorderBrush="#ababab" BorderThickness="1">
           <Grid x:Name="Connections_Grid">
             <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="1" />
+              <ColumnDefinition Width="{Binding FontSize, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource FontToWidth}}" d:Width="50" />
               <ColumnDefinition />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="{Binding FontSize, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource FontToWidth}}" d:Width="50" />
+              <ColumnDefinition Width="{Binding FontSize, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource FontToWidth}}" d:Width="50" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
               <RowDefinition />
               <RowDefinition Height="Auto" />
               <RowDefinition />
               <RowDefinition />
+              <RowDefinition />
             </Grid.RowDefinitions>
 
             <!--#region  Header-->
 
-            <GridSplitter
-              Grid.RowSpan="99"
-              Grid.Column="1"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Stretch"
-              Background="#ababab" />
-            <Rectangle
-              Grid.Row="1"
-              Grid.Column="2"
-              Height="1"
-              Margin="10,0,10,0"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Stretch"
-              Fill="Black" />
             <TextBlock
               Grid.RowSpan="3"
               Grid.Column="0"
@@ -87,25 +74,33 @@
               HorizontalAlignment="Center"
               VerticalAlignment="Center"
               Text="编号" />
+            <Rectangle
+              Grid.Row="1"
+              Grid.Column="1"
+              Height="1"
+              Margin="10,0,10,0"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              Fill="Black" />
             <TextBlock
-              Grid.Column="2"
+              Grid.Column="1"
               HorizontalAlignment="Center"
               Text="接口位姿" />
             <TextBlock
               Grid.Row="2"
-              Grid.Column="2"
+              Grid.Column="1"
               HorizontalAlignment="Center"
               Text="运动方向" />
+            <Button
+              Grid.RowSpan="3"
+              Grid.Column="2"
+              Padding="5,0,5,0"
+              Background="LightGreen"
+              Command="{Binding AddNewJointCommand}"
+              Content="新增" />
             <TextBlock
               Grid.RowSpan="3"
               Grid.Column="3"
-              Margin="5,0,5,0"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              Text="新增" />
-            <TextBlock
-              Grid.RowSpan="3"
-              Grid.Column="4"
               Margin="5,0,5,0"
               HorizontalAlignment="Center"
               VerticalAlignment="Center"
@@ -113,24 +108,82 @@
 
             <!--#endregion-->
 
-            <Label
-              Grid.Row="3"
-              Padding="2,2,2,2"
-              HorizontalContentAlignment="Center"
-              VerticalContentAlignment="Center"
-              Background="#ffc"
-              Content="新增" />
-            <Button
-              Grid.Row="3"
-              Grid.Column="2"
-              Grid.ColumnSpan="3"
-              Padding="0,0,0,0"
-              HorizontalContentAlignment="Center"
-              VerticalContentAlignment="Center"
-              Background="LightGray"
-              Command="{Binding AddNewJointCommand}"
-              Content="➕"
-              Foreground="{StaticResource OK_Brush}" />
+            <!-- ItemsControl 绑定 List<Trsf>，动态生成行 -->
+            <ItemsControl
+              Grid.Row="4"
+              Grid.ColumnSpan="6"
+              d:DataContext="{d:DesignInstance Type=model:DesignTimeJointsViewModel,
+                                               IsDesignTimeCreatable=True}"
+              ItemsSource="{Binding Joints}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <UniformGrid Columns="1" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="{Binding FontSize, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource FontToWidth}}" d:Width="50" />
+                      <ColumnDefinition />
+                      <ColumnDefinition Width="{Binding FontSize, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource FontToWidth}}" d:Width="50" />
+                      <ColumnDefinition Width="{Binding FontSize, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource FontToWidth}}" d:Width="50" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                      <RowDefinition />
+                      <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <!--  动态生成的行  -->
+                    <TextBlock
+                      Grid.RowSpan="2"
+                      Grid.Column="0"
+                      Margin="5,0,5,0"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Text="{Binding ID}" />
+                    <Button
+                      Grid.Column="1"
+                      Padding="2"
+                      Background="LightGray"
+                      Command="{Binding DataContext.SetTrsfCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                      CommandParameter="{Binding}"
+                      Content="{Binding Connection}" />
+                    <Button
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      Padding="2"
+                      Background="LightGray"
+                      Command="{Binding DataContext.SetMFCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                      CommandParameter="{Binding}"
+                      Content="{Binding MovementFormula}" />
+
+                    <!--  新增按钮  -->
+                    <Button
+                      Grid.RowSpan="2"
+                      Grid.Column="2"
+                      Padding="0,0,0,0"
+                      Background="LightGray"
+                      Command="{Binding DataContext.AddNewJointCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                      CommandParameter="{Binding}"
+                      Content="➕"
+                      Foreground="{StaticResource OK_Brush}" />
+
+                    <!--  删除按钮  -->
+                    <Button
+                      Grid.RowSpan="2"
+                      Grid.Column="3"
+                      Padding="0,0,0,0"
+                      Background="LightGray"
+                      Command="{Binding DataContext.RemoveJointCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                      CommandParameter="{Binding}"
+                      Content="❌"
+                      Foreground="{StaticResource Cancel_Brush}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
           </Grid>
         </Border>
 

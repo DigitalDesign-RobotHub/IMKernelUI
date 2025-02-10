@@ -163,7 +163,7 @@ public class ThreeDimensionContext {
 	/// <summary>
 	/// 设置选择模式
 	/// </summary>
-	/// <param name="theMode"></param>
+	/// <param nameString="theMode"></param>
 	public void SetDefaultSelectionMode( OCCTK.OCC.AIS.SelectionMode theMode ) {
 		AISContext.SetDefaultSelectionMode(theMode);
 	}

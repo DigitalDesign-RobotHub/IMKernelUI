@@ -198,7 +198,7 @@ public partial class OCCCanvas:Form {
 	/// <summary>
 	/// 循环选择下一个枚举值
 	/// </summary>
-	/// <param name="currentEnum"></param>
+	/// <param nameString="currentEnum"></param>
 	/// <returns></returns>
 	private static T CycleEnum<T>( T currentEnum )
 		where T : Enum {
@@ -267,7 +267,7 @@ public partial class OCCCanvas:Form {
 	/// <summary>
 	/// 设置相机视图方向为theMode
 	/// </summary>
-	/// <param name="theMode"></param>
+	/// <param nameString="theMode"></param>
 	public void SetViewOrientation( ViewOrientation theMode ) {
 		CurrentViewOrientation = theMode;
 		View.SetViewOrientation(theMode, true);
@@ -283,7 +283,7 @@ public partial class OCCCanvas:Form {
 	/// <summary>
 	/// 设置隐藏线模式
 	/// </summary>
-	/// <param name="theMode"></param>
+	/// <param nameString="theMode"></param>
 	public void SetHidden( bool toOpen ) {
 		View.SetDegenerateMode(toOpen);
 		IsDegenerateMode = toOpen;

@@ -78,7 +78,10 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	private Trsf theTrsf;
 
 	public Trsf TheTrsf {
-		get { return theTrsf; }
+		get {
+			//! 取值必须创建新对象，否则传出的是托管地址
+			return (Trsf)theTrsf.Clone( );
+		}
 		set {
 			backupTrsf = value;
 			(X, Y, Z) = value.Translation;
@@ -144,8 +147,8 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	}
 
 	private void SetTranslation( int index, double value ) {
-		var (x, y, z) = TheTrsf.Translation;
-		TheTrsf.SetTranslationPart(
+		var (x, y, z) = theTrsf.Translation;
+		theTrsf.SetTranslationPart(
 			index switch {
 				0 => new(value, y, z),
 				1 => new(x, value, z),
@@ -214,7 +217,7 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	}
 
 	private void SetWPR( int index, double value ) {
-		var q = TheTrsf.Rotation;
+		var q = theTrsf.Rotation;
 		var (w, p, r) = q.ToEuler(EulerSequence.Intrinsic_XYZ);
 		(w, p, r) = index switch {
 			0 => (value, p, r),
@@ -222,7 +225,7 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 			2 => (w, p, value),
 			_ => throw new ArgumentOutOfRangeException(nameof(index))
 		};
-		TheTrsf.SetRotationPart(new Quat(w, p, r, EulerSequence.Intrinsic_XYZ));
+		theTrsf.SetRotationPart(new Quat(w, p, r, EulerSequence.Intrinsic_XYZ));
 	}
 
 	#endregion
@@ -250,37 +253,37 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 	//    set => SetQuat(3, value);
 	//}
 
-	//private double GetQuat(int index)
+	//private double GetQuat(int Index)
 	//{
 	//    var quat = TheTrsf.Rotation;
 	//    double x = quat.X;
 	//    double y = quat.Y;
 	//    double z = quat.Z;
 	//    double w = quat.W;
-	//    return index switch
+	//    return Index switch
 	//    {
 	//        0 => x,
 	//        1 => y,
 	//        2 => z,
 	//        3 => w,
-	//        _ => throw new ArgumentOutOfRangeException(nameof(index))
+	//        _ => throw new ArgumentOutOfRangeException(nameof(Index))
 	//    };
 	//}
 
-	//private void SetQuat(int index, double value)
+	//private void SetQuat(int Index, double value)
 	//{
 	//    var quat = TheTrsf.Rotation;
 	//    double x = quat.X;
 	//    double y = quat.Y;
 	//    double z = quat.Z;
 	//    double w = quat.W;
-	//    (x, y, z, w) = index switch
+	//    (x, y, z, w) = Index switch
 	//    {
 	//        0 => (value, y, z, w),
 	//        1 => (x, value, z, w),
 	//        2 => (x, y, value, w),
 	//        3 => (x, y, z, value),
-	//        _ => throw new ArgumentOutOfRangeException(nameof(index))
+	//        _ => throw new ArgumentOutOfRangeException(nameof(Index))
 	//    };
 	//    TheTrsf.SetRotationPart(new Quat(x, y, z, w));
 	//}

@@ -15,8 +15,3 @@ public record PartSettingTrsfMessage( ) { };
 /// 设置MovementFormula
 /// </summary>
 public record PartSettingMFMessage( );
-
-/// <summary>
-/// 新增连接点
-/// </summary>
-public record AddNewJointMessage( );

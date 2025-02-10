@@ -132,8 +132,8 @@ public class AirspacePopup:Popup {
 	/// <summary>
 	/// 当绑定的控件发生变化，注册SizeChanged事件
 	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
+	/// <param nameString="sender"></param>
+	/// <param nameString="e"></param>
 	private void PlacementTargetChanged( object? sender, EventArgs e ) {
 		FrameworkElement? placementTarget = this.PlacementTarget as FrameworkElement;
 		if( placementTarget != null ) {
@@ -273,7 +273,7 @@ public class AirspacePopup:Popup {
 	/// <summary>
 	/// 设置窗口的 TopMost 状态（置顶或取消置顶）。
 	/// </summary>
-	/// <param name="isTop">是否置顶窗口，true 为置顶，false 为取消置顶。</param>
+	/// <param nameString="isTop">是否置顶窗口，true 为置顶，false 为取消置顶。</param>
 	/// <remarks>
 	/// 此方法通过 Win32 API 调用更改窗口的 Z-Order，从而实现窗口置顶或取消置顶功能。
 	/// 它首先检测当前窗口的 TopMost 状态，避免重复设置。
@@ -379,8 +379,8 @@ public class AirspacePopup:Popup {
 	/// <summary>
 	/// 调用 Windows API 获取指定窗口的矩形信息。
 	/// </summary>
-	/// <param name="hWnd">窗口的句柄。</param>
-	/// <param name="lpRect">输出的 RECT 结构体，用于接收窗口的边界信息。</param>
+	/// <param nameString="hWnd">窗口的句柄。</param>
+	/// <param nameString="lpRect">输出的 RECT 结构体，用于接收窗口的边界信息。</param>
 	/// <returns>如果成功，返回 true；否则返回 false。</returns>
 	[DllImport("user32.dll")]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -389,13 +389,13 @@ public class AirspacePopup:Popup {
 	/// <summary>
 	/// 调用 Windows API 设置窗口的位置和 Z 顺序。
 	/// </summary>
-	/// <param name="hWnd">目标窗口的句柄。</param>
-	/// <param name="hWndInsertAfter">Z 顺序的参照窗口句柄。</param>
-	/// <param name="X">新位置的 X 坐标。</param>
-	/// <param name="Y">新位置的 Y 坐标。</param>
-	/// <param name="cx">窗口的新宽度。</param>
-	/// <param name="cy">窗口的新高度。</param>
-	/// <param name="uFlags">用于定义窗口位置的标志。</param>
+	/// <param nameString="hWnd">目标窗口的句柄。</param>
+	/// <param nameString="hWndInsertAfter">Z 顺序的参照窗口句柄。</param>
+	/// <param nameString="X">新位置的 X 坐标。</param>
+	/// <param nameString="Y">新位置的 Y 坐标。</param>
+	/// <param nameString="cx">窗口的新宽度。</param>
+	/// <param nameString="cy">窗口的新高度。</param>
+	/// <param nameString="uFlags">用于定义窗口位置的标志。</param>
 	/// <returns>如果成功，返回 true；否则返回 false。</returns>
 	[DllImport("user32.dll")]
 	private static extern bool SetWindowPos(

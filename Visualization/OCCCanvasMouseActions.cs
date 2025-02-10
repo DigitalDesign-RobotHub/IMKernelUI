@@ -134,7 +134,7 @@ public partial class OCCCanvas {
 	/// <summary>
 	/// 解析配置文件
 	/// </summary>
-	/// <param name="filePath"></param>
+	/// <param nameString="filePath"></param>
 	/// <returns></returns>
 	public static Dictionary<(MouseButtons, Keys), Action3d>? LoadActionMap( string filePath ) {
 		// 读取JSON文件
@@ -350,8 +350,8 @@ public partial class OCCCanvas {
 	/// <summary>
 	/// 计时器触发后将光标恢复为默认光标
 	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
+	/// <param nameString="sender"></param>
+	/// <param nameString="e"></param>
 	private void CursorResetTimer_Tick( object? sender, EventArgs e ) {
 		Cursor = System.Windows.Forms.Cursors.Default;
 		// 停止计时器
@@ -600,8 +600,8 @@ public partial class OCCCanvas {
 	/// <summary>
 	/// 键盘事件
 	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
+	/// <param nameString="sender"></param>
+	/// <param nameString="e"></param>
 	private void OnKeyDown( object? sender, KeyEventArgs e ) {
 		OnKeyDownEvent?.Invoke(e.KeyCode);
 		if( e.KeyCode == Keys.F ) {
@@ -622,7 +622,7 @@ public partial class OCCCanvas {
 	/// <summary>
 	/// 绘制选择框
 	/// </summary>
-	/// <param name="draw"></param>
+	/// <param nameString="draw"></param>
 	private void DrawRectangle( ) {
 		myBubberBand.SetRectangle(
 			Math.Min(mouseDownX, mouseCurrentX),

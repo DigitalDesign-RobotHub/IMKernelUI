@@ -24,12 +24,28 @@
     </ResourceDictionary>
   </UserControl.Resources>
 
-  <GroupBox Padding="-2,0,-2,0" Header="运动类型">
+  <GroupBox Padding="-2,0,-2,0" Header="运动">
     <StackPanel Orientation="Vertical">
-      <dxlc:LayoutItem Label="运动方向：">
+      <!--  运动类型  -->
+      <dxlc:LayoutItem Label="运动类型：">
         <ComboBox ItemsSource="{Binding AvailableMovements}" SelectedItem="{Binding SelectedMF}" />
         <!--  todo 根据方向的不同设置下拉菜单的底色 X/Y/Z  -->
       </dxlc:LayoutItem>
+      <!--  运动轴  -->
+      <GroupBox Padding="0,2,0,0" Header="运动轴">
+        <dxlc:LayoutGroup Orientation="Horizontal">
+          <dxlc:LayoutItem Label="X: ">
+            <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding X, FallbackValue='NaN', TargetNullValue='0.0'}" />
+          </dxlc:LayoutItem>
+          <dxlc:LayoutItem Label="Y: ">
+            <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding Y, FallbackValue='NaN', TargetNullValue='0.0'}" />
+          </dxlc:LayoutItem>
+          <dxlc:LayoutItem Label="Z: ">
+            <dxe:TextEdit HorizontalContentAlignment="Center" Text="{Binding Z, FallbackValue='NaN', TargetNullValue='0.0'}" />
+          </dxlc:LayoutItem>
+        </dxlc:LayoutGroup>
+      </GroupBox>
+      <!--  连续运动的运动范围  -->
       <Grid Margin="0,2,0,0">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
@@ -68,8 +84,9 @@
           <dxe:TextEdit Text="{Binding MaxMovement}" />
         </dxlc:LayoutItem>
       </Grid>
-      <!--#region 交互按钮-->
+      <!--  步进运动的运动值  -->
 
+      <!--#region 交互按钮-->
       <dxlc:LayoutGroup Margin="0,4,0,0" Visibility="{Binding Visibility}">
         <dxlc:LayoutItem>
           <Button

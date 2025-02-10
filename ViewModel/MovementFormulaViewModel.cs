@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 
@@ -17,19 +18,19 @@ using OCCTK.OCC.gp;
 namespace IMKernelUI.ViewModel;
 public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 	public MovementFormulaViewModel( ) {
-		name = "未定义";
+		nameString = "未定义";
 		MovementType = MovementType.Static;
-		MovementAxis = new(new( ), new Dir(1, 0, 0));
+		X = 1.0;
+		Y = 0.0;
+		Z = 0.0;
 		InitMovement = 0.0;
 		MinMovement = -1000;
 		MaxMovement = 1000;
 		//MinMovement = double.NegativeInfinity;
 		//MaxMovement = double.PositiveInfinity;
-
+		StepValues = new( );
 		//view
-		AvailableMovements = new(MovementFormulaMap.All.ToList( ));
-		//todo 自定义运动轴
-		//AvailableMovements.Add(new MovementFormula("自定义", MovementType.Translation, new( )));
+		AvailableMovements = new(MovementFormulaMap.All);
 		SelectedMF = MovementFormula.Static;
 		Visibility = Visibility.Visible;
 		backupMF = TheMF;
@@ -52,17 +53,19 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 
 	#region View
 
-	public List<MovementFormula> AvailableMovements { get; set; }
+	public List<MovementFormula> AvailableMovements { get; }
 
 	[ObservableProperty]
 	private MovementFormula selectedMF;
 	partial void OnSelectedMFChanged( MovementFormula value ) {
-		if( value.Name == "自定义" ) {
-			//todo 自定义运动轴
+		if( value.NameString == "自定义" ) {
+			nameString = value.NameString;
 		} else {
-			name = value.Name;
+			nameString = value.NameString;
 			MovementType = value.Type;
-			MovementAxis = value.Axis;
+			X = value.Dir.X;
+			Y = value.Dir.Y;
+			Z = value.Dir.Z;
 		}
 	}
 
@@ -76,30 +79,53 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 	public MovementFormula TheMF {
 		get {
 			return
-				new(name, MovementType, MovementAxis) {
+				new(nameString, MovementType, new(X, Y, Z)) {
 					InitMovement = InitMovement,
 					MinMovement = MinMovement,
-					MaxMovement = MaxMovement
+					MaxMovement = MaxMovement,
+					StepValues = StepValues.ToList( ),
 				};
 		}
 		set {
-			name = value.Name;
+			nameString = value.NameString;
 			MovementType = value.Type;
-			MovementAxis = value.Axis;
+			X = value.Dir.X;
+			Y = value.Dir.Y;
+			Z = value.Dir.Z;
 			InitMovement = value.InitMovement;
 			MinMovement = value.MinMovement;
 			MaxMovement = value.MaxMovement;
+			MovementFormula? finded=AvailableMovements.Find(v => v.GetHashCode() == value.GetHashCode());
+			if( finded != null ) {
+				SelectedMF = value;
+			} else {
+				SelectedMF = MovementFormula.Custom;
+			}
+			StepValues = new(value.StepValues);
 			backupMF = value;
 		}
 	}
 
-	private string name;
+	private string nameString;
 
+	/// <summary>
+	/// 运动的基本类型
+	/// </summary>
 	[ObservableProperty]
 	private MovementType movementType;
 
+	/// <summary>
+	/// 运动方向/旋转轴方向
+	/// </summary>
+	/// <remarks>
+	/// 有正负的区别
+	/// </remarks>
 	[ObservableProperty]
-	private Ax1 movementAxis;
+	private double x;
+	[ObservableProperty]
+	private double y;
+	[ObservableProperty]
+	private double z;
 
 	/// <summary>
 	/// 初始运动值
@@ -118,6 +144,11 @@ public partial class MovementFormulaViewModel:ObservableObject, IOCCFinilize {
 	/// </summary>
 	[ObservableProperty]
 	private double maxMovement;
+
+	/// <summary>
+	/// 最大运动值
+	/// </summary>
+	public ObservableCollection<double> StepValues { get; set; }
 
 	#endregion
 
