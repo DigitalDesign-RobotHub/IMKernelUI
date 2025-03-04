@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Data;
 
@@ -148,15 +149,18 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 
 	private void SetTranslation( int index, double value ) {
 		var (x, y, z) = theTrsf.Translation;
-		theTrsf.SetTranslationPart(
-			index switch {
-				0 => new(value, y, z),
-				1 => new(x, value, z),
-				2 => new(x, y, value),
-				_ => throw new ArgumentOutOfRangeException(nameof(index))
-			}
-		);
-	}
+		(x, y, z) = index switch {
+			0 => (value, y, z),
+			1 => (x, value, z),
+			2 => (x, y, value),
+			_ => throw new ArgumentOutOfRangeException(nameof(index))
+		};
+
+        var newTranslation = new Vec(x,y,z);
+		var newRotation = theTrsf.Rotation;
+
+        theTrsf = new Trsf(newTranslation, newRotation);
+    }
 
 	#endregion
 
@@ -225,7 +229,10 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 			2 => (w, p, value),
 			_ => throw new ArgumentOutOfRangeException(nameof(index))
 		};
-		theTrsf.SetRotationPart(new Quat(w, p, r, EulerSequence.Intrinsic_XYZ));
+
+		var newTranslation = theTrsf.Translation;
+		var newRotation = new Quat(w, p, r, EulerSequence.Intrinsic_XYZ);
+		theTrsf = new Trsf(newTranslation, newRotation);
 	}
 
 	#endregion
