@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Data;
 
@@ -11,13 +10,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 
-using DevExpress.ClipboardSource.SpreadsheetML;
-using DevExpress.Mvvm.Native;
-
 using IMKernel.Interfaces;
 using IMKernel.Kinematic;
 using IMKernel.Model;
-using IMKernel.OCCExtension;
 using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
@@ -25,7 +20,6 @@ using IMKernelUI.Message;
 
 using log4net;
 
-using OCCTK.Extension;
 using OCCTK.OCC.gp;
 
 namespace IMKernelUI.ViewModel;
@@ -110,7 +104,7 @@ public partial class PartViewModel:ObservableObject, IOCCFinilize, IPart {
 
 	#region OCC
 
-	private OCCCanvas? occCanvas;
+	private readonly OCCCanvas? occCanvas;
 
 	public void OCCFinilize( ) {
 		//todo 
@@ -239,9 +233,9 @@ public class DesignTimeJointsViewModel {
 	public DesignTimeJointsViewModel( ) {
 		Joints = new( )
 		{
-			new ( 1,new Trsf(new(),new Pnt(1,2,3)), MovementFormula.Static),
-			new ( 2,new Trsf(new(),new Pnt(2,3,4)), MovementFormula.dX_Minus),
-			new ( 3,new Trsf(new(),new Pnt(3,4,5)), MovementFormula.dY_Plus),
+			new ( 1,new Trsf(new Vec(1,2,3)), MovementFormula.Static),
+			new ( 2,new Trsf(new Vec(2,3,4)), MovementFormula.dX_Minus),
+			new ( 3,new Trsf(new Vec(3,4,5)), MovementFormula.dY_Plus),
 		};
 	}
 }

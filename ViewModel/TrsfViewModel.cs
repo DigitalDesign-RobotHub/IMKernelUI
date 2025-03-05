@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Transactions;
 using System.Windows;
 using System.Windows.Data;
 
@@ -156,11 +155,11 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 			_ => throw new ArgumentOutOfRangeException(nameof(index))
 		};
 
-        var newTranslation = new Vec(x,y,z);
+		var newTranslation = new Vec(x,y,z);
 		var newRotation = theTrsf.Rotation;
 
-        theTrsf = new Trsf(newTranslation, newRotation);
-    }
+		theTrsf = new Trsf(newTranslation, newRotation);
+	}
 
 	#endregion
 
@@ -381,7 +380,7 @@ public partial class TrsfViewModel:ObservableObject, IOCCFinilize {
 
 	#region command
 
-	private ICommandManager commandManager;
+	private readonly ICommandManager commandManager;
 
 	/// <summary>
 	/// 用于撤销的变换的值
