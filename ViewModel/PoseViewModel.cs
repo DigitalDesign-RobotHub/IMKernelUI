@@ -1,45 +1,46 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 
+using IMKernel.Interfaces;
 using IMKernel.OCCExtension;
 using IMKernel.Visualization;
 
 using IMKernelUI.Interfaces;
 using IMKernelUI.Message;
 
+using log4net;
+
 namespace IMKernelUI.ViewModel;
 
 public partial class PoseViewModel:ObservableObject, IOCCFinilize {
-
+	private static readonly ILog log = LogManager.GetLogger(typeof(PoseViewModel));
 	public PoseViewModel( ) {
 		//value
-		Name = "";
-		ReferPose = OriginPose.ToPose( );
-		backupPose = OriginPose.ToPose( );
-		TrsfVM = new( );
+		this.ReferPose = ORIGIN.Instance;
+		this.backupPose = ORIGIN.Instance;
+		this.TrsfVM = new( );
 		//view
-		References = new( );
-		TrsfVM.IsSettingVisbility = Visibility.Collapsed;
+		this.References = [ ];
+		this.TrsfVM.IsSettingVisbility = Visibility.Collapsed;
 
 		#region Message
 
 		//view
 		WeakReferenceMessenger.Default.Register<ReferencePosesChangedMessage>(this, ( r, m ) => {
 			if( m.Refer.Count != 0 ) {
-				References.Clear( );
-				m.Refer.ForEach(x => References.Add(x));
+				this.References.Clear( );
+				m.Refer.ForEach(x => this.References.Add(x));
 			}
 		});
 
 		//occ
-		context = WeakReferenceMessenger.Default.Send<Main3DContextRequestMessage>( );
+		this.context = WeakReferenceMessenger.Default.Send<Main3DContextRequestMessage>( );
 		WeakReferenceMessenger.Default.Register<Main3DContextChangedMessage>(this, ( r, m ) => {
-			context = m.Context;
+			this.context = m.Context;
 		});
 
 		#endregion
@@ -50,7 +51,7 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 	private ThreeDimensionContext? context;
 
 	public void OCCFinilize( ) {
-		TrsfVM.OCCFinilize( );
+		this.TrsfVM.OCCFinilize( );
 	}
 
 	#endregion
@@ -59,12 +60,11 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 
 	public Pose ThePose {
 		get {
-			return new Pose(Name, TrsfVM.TheTrsf, ReferPose);
+			return new Pose(this.TrsfVM.TheTrsf, this.ReferPose);
 		}
 		set {
-			Name = value.Name;
-			ReferPose = value.Reference;
-			TrsfVM.TheTrsf = value.Transfrom;
+			this.ReferPose = value.Reference;
+			this.TrsfVM.TheTrsf = value.Datum.Transform;
 		}
 	}
 
@@ -75,19 +75,8 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 	public TrsfViewModel trsfVM;
 
 	partial void OnTrsfVMChanged( TrsfViewModel value ) {
-		ApplySettingCommand.NotifyCanExecuteChanged( );
-		//通知绑定整个对象发生了变化
-		OnPropertyChanged(string.Empty);
-	}
-
-	/// <summary>
-	///	名称
-	/// </summary>
-	[ObservableProperty]
-	private string name;
-
-	partial void OnNameChanged( string value ) {
-		ApplySettingCommand.NotifyCanExecuteChanged( );
+		//todo 更新
+		//ApplySettingCommand.NotifyCanExecuteChanged( );
 		//通知绑定整个对象发生了变化
 		OnPropertyChanged(string.Empty);
 	}
@@ -96,10 +85,10 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 	/// 参考位姿
 	/// </summary>
 	[ObservableProperty]
-	private Pose referPose;
+	private IPose referPose;
 
-	partial void OnReferPoseChanged( Pose value ) {
-		//todo occ
+	partial void OnReferPoseChanged( IPose value ) {
+		//todo occ更新
 	}
 
 	#endregion
@@ -147,26 +136,25 @@ public partial class PoseViewModel:ObservableObject, IOCCFinilize {
 	/// <summary>
 	/// 用于撤销设置的值
 	/// </summary>
-	private Pose backupPose;
+	private readonly IPose backupPose;
 
-	[RelayCommand(CanExecute = nameof(CanApplySetting))]
+	//[RelayCommand(CanExecute = nameof(CanApplySetting))]
 	private void ApplySetting( ) {
 		//OCCCanvas?.Detach( );
 		WeakReferenceMessenger.Default.Send(new PoseAppliedMessage( ));
 	}
 
 
-	private bool CanApplySetting( ) {
-		if( Name == "" ) {
-			return false;
-		}
-		return true;
-	}
+	//private bool CanApplySetting( ) {
+	//	return true;
+	//}
 
 	[RelayCommand]
 	private void CancelSetting( ) {
 		//OCCCanvas?.Detach( );
-		ThePose = backupPose;
+		if( this.backupPose is Pose p ) {
+			this.ThePose = p;
+		}
 		WeakReferenceMessenger.Default.Send(new PoseSetCanceledMessage( ));
 	}
 

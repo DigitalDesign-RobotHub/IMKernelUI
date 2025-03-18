@@ -25,9 +25,6 @@
 
   <Border BorderBrush="#ababab" BorderThickness="1">
     <dxlc:LayoutControl Padding="2,2,2,2" Orientation="Vertical">
-      <dxlc:LayoutItem Label="名称：">
-        <dxe:TextEdit />
-      </dxlc:LayoutItem>
       <dxlc:LayoutItem Label="参考：">
         <dxe:ComboBoxEdit ItemsSource="{Binding References}" SelectedItem="{Binding ThePose.Reference}" />
       </dxlc:LayoutItem>

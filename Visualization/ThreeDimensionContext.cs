@@ -120,22 +120,28 @@ public class ThreeDimensionContext {
 
 	#region 显示
 
-	public void Display( InteractiveObject theAIS, bool Toupdate = true ) {
+	public void Display( InteractiveObject theAIS, bool toupdate = true ) {
 		AISContext.Display(theAIS, false);
 		//默认颜色为灰色
-		AISContext.SetColor(theAIS, new Color(125, 125, 125), Toupdate);
+		AISContext.SetColor(theAIS, new Color(125, 125, 125), false);
+		if( toupdate ) {
+		AISContext.UpdateCurrentViewer();
+		}
 	}
 
-	public void Redisplay( InteractiveObject theAIS, bool Toupdate = true ) {
+	public void Redisplay( InteractiveObject theAIS, bool toupdate = true ) {
 		AISContext.Redisplay(theAIS, false);
+		if( toupdate ) {
+			AISContext.UpdateCurrentViewer();
+		}
 	}
 
 	public void EraseSelected( ) {
 		AISContext.EraseSelected( );
 	}
 
-	public void Erase( InteractiveObject theAIS, bool Toupdate ) {
-		AISContext.Erase(theAIS, Toupdate);
+	public void Erase( InteractiveObject theAIS, bool toupdate=true ) {
+		AISContext.Erase(theAIS, toupdate);
 	}
 
 	public void EraseAll( bool update ) {
@@ -148,14 +154,16 @@ public class ThreeDimensionContext {
 		}
 	}
 
-	public void Remove( InteractiveObject theAIS, bool Toupdate ) {
-		AISContext.Remove(theAIS, Toupdate);
+	public void Remove( InteractiveObject theAIS, bool toupdate ) {
+		AISContext.Remove(theAIS, toupdate);
 	}
 
 	public void Update( ) {
 		AISContext.UpdateCurrentViewer( );
 	}
-
+	public bool IsDisplayed(InteractiveObject theAIS ) {
+		return  AISContext.IsDisplayed(theAIS);
+	}
 	#endregion
 
 	#region 对象交互
